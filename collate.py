@@ -17,14 +17,11 @@ for key, value in witnessData.items():
             csTable[value[first] + value[second]].append((key, first, second))
 
 # Sort table into common sequence list (csList)
-#   ordered by 1) number of witnesses (numerica high to low) and 2) sequence (alphabetic low to high)
-csList = [(k, csTable[k]) for k in sorted(csTable, key=lambda k: (-len(csTable[k]), k))]
+#   order by 1) number of witnesses (numerica high to low) and 2) sequence (alphabetic low to high)
+csList = [k for k in sorted(csTable, key=lambda k: (-len(csTable[k]), k))]
 
-# Build topologically ordered list (toList)
-toList = []
-for bigram, locations in csList:
-    first, second = list(bigram)
-    print(first, second, (locations))
+# # Build topologically ordered list (toList)
 
 # Diagnostic output
-# print(csList)
+print(csList)
+
