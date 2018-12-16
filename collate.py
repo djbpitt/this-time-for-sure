@@ -20,8 +20,22 @@ for key, value in witnessData.items():
 #   order by 1) number of witnesses (numerica high to low) and 2) sequence (alphabetic low to high)
 csList = [k for k in sorted(csTable, key=lambda k: (-len(csTable[k]), k))]
 
-# # Build topologically ordered list (toList)
+# Build topologically ordered list (toList)
+toList = []
+for skipgram in csList:
+    locations = csTable[skipgram] # list of tuples of (siglum, location1, location2) for skipgram
+    norms = list(skipgram) # two characters
+    for skipgramPos in range(len(norms)): # loop over characters
+        norm = skipgram[skipgramPos] # normalized value of toke
+        for location in locations: # for each character, get witness and offset within witness
+            siglum = location[0] # witness identifier
+            offset = location[skipgramPos + 1] # offset of norm within witness
+            # print(siglum, offset, norm) # diagnostic
+            # get lower and upper bounds for witness and offset within witness
+            for dictPos in range(len(toList)):
+                currentDict = toList[dictPos]
+
 
 # Diagnostic output
-print(csList)
+print(toList)
 
