@@ -1,5 +1,7 @@
 import collections
 
+# Output: shortest common supersequence of witnesses, which is the same as the topological order,
+#   and which can be used, with the witnesses, to construct the variant graph
 # Assumption: Align deepest matches first
 
 # TODO: Single-token witnesses are not processed because they have no bigrams; this is an error
@@ -25,7 +27,7 @@ csList = [k for k in sorted(csTable, key=lambda k: (-len(csTable[k]), k))]
 
 # Build topologically ordered list (toList)
 toList = []
-toList.extend([{'name': '#start'}, {'name': '#end'}])
+toList.extend([{'norm': '#start'}, {'norm': '#end'}])
 for skipgram in csList:
     locations = csTable[skipgram]  # list of tuples of (siglum, location1, location2) for skipgram
     norms = list(skipgram)  # two characters; TODO: will need to be changed when tokens are not single characters
@@ -36,8 +38,31 @@ for skipgram in csList:
             offset = location[skipgramPos + 1]  # offset of token within witness
             # print('witness = ', siglum, '; offset = ', offset, '; norm = ', norm) # diagnostic
             # get lower and upper bounds for witness and offset within witness
+            floor = 0
+            ceiling = len(toList) - 1
+            modifyMe = None
+            # print('siglum = ', siglum, '; offset = ', offset) # diagnostic
             for dictPos in range(len(toList)):
                 currentDict = toList[dictPos]
-
+                # print('currentDict = ', currentDict) # diagnostic
+                if siglum not in currentDict.keys():  # this dictionary isn't relevant; check the next item in toList
+                    pass
+                else:
+                    if currentDict[siglum] == offset:  # the token is already in the list
+                        pass
+                    elif currentDict[siglum] < offset:
+                        floor = dictPos
+                    else:
+                        ceiling = dictPos
+            # scan from floor to ceiling, looking for matching 'norm' value
+            for pos in range(floor, ceiling):
+                if toList[pos]['norm'] == norm:
+                    modifyMe = toList[pos]
+                    break
+            if modifyMe is None:
+                toList.insert(ceiling, {'norm': norm, siglum: offset})
+            else:
+                modifyMe[siglum] = offset
 # Diagnostic output
-print(toList)
+for dict in toList:
+    print(dict)
