@@ -1,4 +1,5 @@
 import collections
+from itertools import permutations
 
 # Output: shortest common supersequence of witnesses, which is the same as the topological order,
 #   and which can be used, with the witnesses, to construct the variant graph
@@ -15,19 +16,14 @@ witnessData = {'wit1': ['a', 'b', 'c', 'd', 'e'], 'wit2': ['a', 'e', 'c', 'd'], 
 # key is skip-bigram
 # value is list of (siglum, pos1, pos2) tuple, with positions of skipgram characters
 
-witOrders = [['wit1', 'wit2', 'wit3'],
-            ['wit1', 'wit3', 'wit2'],
-            ['wit2', 'wit1', 'wit3'],
-            ['wit2', 'wit3', 'wit1'],
-            ['wit3', 'wit1', 'wit2'],
-            ['wit3', 'wit2', 'wit1']]
+witOrders = list(permutations(['wit1', 'wit2', 'wit3']))
 for witOrder in witOrders:
     csTable = collections.defaultdict(list)
     for key in witOrder:
         value = witnessData[key]
         for first in range(len(value)):
             for second in range(first + 1, len(value)):
-                csTable[value[first] + value[second]].append((key, first, second))
+                csTable[(value[first], value[second])].append((key, first, second))
 
     # for key, value in witnessData.items():
     #     for first in range(len(value)):
@@ -77,8 +73,8 @@ for witOrder in witOrders:
                 else:
                     modifyMe[siglum] = offset
     # Diagnostic output
-    # print('added: ', norm, ' from ', skipgram, ' at ', location, ' with floor=', floor, ' and ceiling=', ceiling, sep='')
-    # for item in toList:
-    #     print(item)
+    print('added: ', norm, ' from ', skipgram, ' at ', location, ' with floor=', floor, ' and ceiling=', ceiling, sep='')
+    for item in toList:
+        print(item)
     print(witOrder)
     print([item['norm'] for item in toList])
