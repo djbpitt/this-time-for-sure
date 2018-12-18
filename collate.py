@@ -32,19 +32,15 @@ for skipgram in csList:
     locations = csTable[skipgram]  # list of tuples of (siglum, location1, location2) for skipgram
     norms = list(skipgram)  # two characters; TODO: will need to be changed when tokens are not single characters
     for skipgramPos in range(len(norms)):  # loop over head and tail by position ([1, 2])
-        norm = skipgram[skipgramPos]  # normalized value of token
+        norm = norms[skipgramPos]  # normalized value of token
         for location in locations:  # for each token, get witness and offset within witness
             siglum = location[0]  # witness identifier
             offset = location[skipgramPos + 1]  # offset of token within witness
-            # print('witness = ', siglum, '; offset = ', offset, '; norm = ', norm) # diagnostic
-            # get lower and upper bounds for witness and offset within witness
             floor = 0
             ceiling = len(toList) - 1
             modifyMe = None
-            # print('siglum = ', siglum, '; offset = ', offset) # diagnostic
             for dictPos in range(len(toList)):
                 currentDict = toList[dictPos]
-                # print('currentDict = ', currentDict) # diagnostic
                 if siglum not in currentDict.keys():  # this dictionary isn't relevant; check the next item in toList
                     pass
                 else:
@@ -54,15 +50,20 @@ for skipgram in csList:
                         floor = dictPos
                     else:
                         ceiling = dictPos
+                        break
             # scan from floor to ceiling, looking for matching 'norm' value
+            # if there is a dictionary to modify, save it as modifyMe (don't modify it yet)
+            # TODO: this gets the leftmost if there is more than one, which is not necessarily optimal
             for pos in range(floor, ceiling):
                 if toList[pos]['norm'] == norm:
                     modifyMe = toList[pos]
                     break
+            # if there is a dictionary to modify, do it; otherwise insert a new dictionary
             if modifyMe is None:
                 toList.insert(ceiling, {'norm': norm, siglum: offset})
             else:
                 modifyMe[siglum] = offset
-# Diagnostic output
-for dict in toList:
-    print(dict)
+            # Diagnostic output
+            print('added: ', norm, ' from ', skipgram, ' at ', location, ' with floor=', floor, ' and ceiling=', ceiling, sep='')
+            for item in toList:
+                print(item)
