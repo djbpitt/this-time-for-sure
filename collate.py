@@ -15,55 +15,70 @@ witnessData = {'wit1': ['a', 'b', 'c', 'd', 'e'], 'wit2': ['a', 'e', 'c', 'd'], 
 # key is skip-bigram
 # value is list of (siglum, pos1, pos2) tuple, with positions of skipgram characters
 
-csTable = collections.defaultdict(list)
-for key, value in witnessData.items():
-    for first in range(len(value)):
-        for second in range(first + 1, len(value)):
-            csTable[value[first] + value[second]].append((key, first, second))
+witOrders = [['wit1', 'wit2', 'wit3'],
+            ['wit1', 'wit3', 'wit2'],
+            ['wit2', 'wit1', 'wit3'],
+            ['wit2', 'wit3', 'wit1'],
+            ['wit3', 'wit1', 'wit2'],
+            ['wit3', 'wit2', 'wit1']]
+for witOrder in witOrders:
+    csTable = collections.defaultdict(list)
+    for key in witOrder:
+        value = witnessData[key]
+        for first in range(len(value)):
+            for second in range(first + 1, len(value)):
+                csTable[value[first] + value[second]].append((key, first, second))
 
-# Sort table into common sequence list (csList)
-#   order by 1) number of witnesses (numerical high to low) and 2) sequence (alphabetic low to high)
-csList = [k for k in sorted(csTable, key=lambda k: (-len(csTable[k]), k))]
+    # for key, value in witnessData.items():
+    #     for first in range(len(value)):
+    #         for second in range(first + 1, len(value)):
+    #             csTable[value[first] + value[second]].append((key, first, second))
 
-# Build topologically ordered list (toList)
-toList = []
-toList.extend([{'norm': '#start'}, {'norm': '#end'}])
-for skipgram in csList:
-    locations = csTable[skipgram]  # list of tuples of (siglum, location1, location2) for skipgram
-    norms = list(skipgram)  # two characters; TODO: will need to be changed when tokens are not single characters
-    for skipgramPos in range(len(norms)):  # loop over head and tail by position ([1, 2])
-        norm = norms[skipgramPos]  # normalized value of token
-        for location in locations:  # for each token, get witness and offset within witness
-            siglum = location[0]  # witness identifier
-            offset = location[skipgramPos + 1]  # offset of token within witness
-            floor = 0
-            ceiling = len(toList) - 1
-            modifyMe = None
-            for dictPos in range(len(toList)):
-                currentDict = toList[dictPos]
-                if siglum not in currentDict.keys():  # this dictionary isn't relevant; check the next item in toList
-                    pass
-                else:
-                    if currentDict[siglum] == offset:  # the token is already in the list
+    # Sort table into common sequence list (csList)
+    #   order by 1) number of witnesses (numerical high to low) and 2) sequence (alphabetic low to high)
+    csList = [k for k in sorted(csTable, key=lambda k: (-len(csTable[k]), k))]
+
+    # Build topologically ordered list (toList)
+    toList = []
+    toList.extend([{'norm': '#start'}, {'norm': '#end'}])
+    for skipgram in csList:
+        locations = csTable[skipgram]  # list of tuples of (siglum, location1, location2) for skipgram
+        norms = list(skipgram)  # two characters; TODO: will need to be changed when tokens are not single characters
+        for skipgramPos in range(len(norms)):  # loop over head and tail by position ([1, 2])
+            norm = norms[skipgramPos]  # normalized value of token
+            for location in locations:  # for each token, get witness and offset within witness
+                siglum = location[0]  # witness identifier
+                offset = location[skipgramPos + 1]  # offset of token within witness
+                floor = 0
+                ceiling = len(toList) - 1
+                modifyMe = None
+                for dictPos in range(len(toList)):
+                    currentDict = toList[dictPos]
+                    if siglum not in currentDict.keys():  # this dictionary isn't relevant; check the next item in toList
                         pass
-                    elif currentDict[siglum] < offset:
-                        floor = dictPos
                     else:
-                        ceiling = dictPos
+                        if currentDict[siglum] == offset:  # the token is already in the list
+                            pass
+                        elif currentDict[siglum] < offset:
+                            floor = dictPos
+                        else:
+                            ceiling = dictPos
+                            break
+                # scan from floor to ceiling, looking for matching 'norm' value
+                # if there is a dictionary to modify, save it as modifyMe (don't modify it yet)
+                # TODO: this gets the leftmost if there is more than one, which is not necessarily optimal
+                for pos in range(floor, ceiling):
+                    if toList[pos]['norm'] == norm:
+                        modifyMe = toList[pos]
                         break
-            # scan from floor to ceiling, looking for matching 'norm' value
-            # if there is a dictionary to modify, save it as modifyMe (don't modify it yet)
-            # TODO: this gets the leftmost if there is more than one, which is not necessarily optimal
-            for pos in range(floor, ceiling):
-                if toList[pos]['norm'] == norm:
-                    modifyMe = toList[pos]
-                    break
-            # if there is a dictionary to modify, do it; otherwise insert a new dictionary
-            if modifyMe is None:
-                toList.insert(ceiling, {'norm': norm, siglum: offset})
-            else:
-                modifyMe[siglum] = offset
-            # Diagnostic output
-            print('added: ', norm, ' from ', skipgram, ' at ', location, ' with floor=', floor, ' and ceiling=', ceiling, sep='')
-            for item in toList:
-                print(item)
+                # if there is a dictionary to modify, do it; otherwise insert a new dictionary
+                if modifyMe is None:
+                    toList.insert(ceiling, {'norm': norm, siglum: offset})
+                else:
+                    modifyMe[siglum] = offset
+    # Diagnostic output
+    # print('added: ', norm, ' from ', skipgram, ' at ', location, ' with floor=', floor, ' and ceiling=', ceiling, sep='')
+    # for item in toList:
+    #     print(item)
+    print(witOrder)
+    print([item['norm'] for item in toList])
