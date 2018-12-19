@@ -12,9 +12,6 @@ from bitarray import bitarray
 
 # Sample data
 witnessData = {'wit1': ['a', 'b', 'c', 'd', 'e'], 'wit2': ['a', 'e', 'c', 'd'], 'wit3': ['a', 'd', 'b']}
-bitArrays = {k:bitarray(len(witnessData[k])) for k in witnessData} # create a bitarray the length of each witness
-for item in bitArrays: # initialize bitarrays to all 0 values
-    bitArrays[item].setall(0)
 
 # Construct common sequence table (csTable) of all witnesses as dict
 # key is skip-bigram
@@ -29,14 +26,12 @@ for witOrder in witOrders:
             for second in range(first + 1, len(value)):
                 csTable[(value[first], value[second])].append((key, first, second))
 
-    # for key, value in witnessData.items():
-    #     for first in range(len(value)):
-    #         for second in range(first + 1, len(value)):
-    #             csTable[value[first] + value[second]].append((key, first, second))
-
     # Sort table into common sequence list (csList)
     #   order by 1) number of witnesses (numerical high to low) and 2) sequence (alphabetic low to high)
     csList = [k for k in sorted(csTable, key=lambda k: (-len(csTable[k]), k))]
+    bitArrays = {k: bitarray(len(witnessData[k])) for k in witnessData}  # create a bitarray the length of each witness
+    for item in bitArrays:  # initialize bitarrays to all 0 values
+        bitArrays[item].setall(0)
 
     # Build topologically ordered list (toList)
     toList = []
@@ -49,10 +44,12 @@ for witOrder in witOrders:
             for location in locations:  # for each token, get witness and offset within witness
                 siglum = location[0]  # witness identifier
                 offset = location[skipgramPos + 1]  # offset of token within witness
+                if bitArrays[siglum][offset] == 1:
+                    print('skipping: ', norm, ' from ', skipgram, ' at ', location)
+                    break
                 floor = 0
                 ceiling = len(toList) - 1
                 modifyMe = None
-                bitArrays[siglum][offset] = 1 # record that we've processed this token
                 for dictPos in range(len(toList)):
                     currentDict = toList[dictPos]
                     if siglum not in currentDict.keys():  # this dictionary isn't relevant; check the next item in toList
@@ -77,9 +74,9 @@ for witOrder in witOrders:
                     toList.insert(ceiling, {'norm': norm, siglum: offset})
                 else:
                     modifyMe[siglum] = offset
-    # Diagnostic output
-    print('added: ', norm, ' from ', skipgram, ' at ', location, ' with floor=', floor, ' and ceiling=', ceiling, sep='')
-    for item in toList:
-        print(item)
+                bitArrays[siglum][offset] = 1  # record that we've processed this token
+                print('added: ', norm, ' from ', skipgram, ' at ', location, ' with floor=', floor, ' and ceiling=', ceiling, sep='')
+    # for item in toList:
+    #     print(item)
     print(witOrder, [item['norm'] for item in toList])
     print(bitArrays)
