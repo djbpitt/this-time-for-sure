@@ -45,7 +45,7 @@ for witOrder in witOrders:
                 siglum = location[0]  # witness identifier
                 offset = location[skipgramPos + 1]  # offset of token within witness
                 if bitArrays[siglum][offset] == 1:
-                    print('skipping: ', norm, ' from ', skipgram, ' at ', location)
+                    # print('skipping: ', norm, ' from ', skipgram, ' at ', location)
                     break
                 floor = 0
                 ceiling = len(toList) - 1
@@ -73,9 +73,9 @@ for witOrder in witOrders:
                 else:
                     modifyMe[siglum] = offset
                 bitArrays[siglum][offset] = 1  # record that we've processed this token
-                print('added: ', norm, ' from ', skipgram, ' at ', location,
-                      ' with floor=', floor, ' and ceiling=', ceiling, sep='')
+                # print('added: ', norm, ' from ', skipgram, ' at ', location,
+                #       ' with floor=', floor, ' and ceiling=', ceiling, sep='')
     # for item in toList:
     #     print(item)
     print(witOrder, [item['norm'] for item in toList])
-    print(bitArrays)
+    # print(bitArrays)
