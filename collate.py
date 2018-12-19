@@ -1,5 +1,6 @@
 import collections
 from itertools import permutations
+from bitarray import bitarray
 
 # Output: shortest common supersequence of witnesses, which is the same as the topological order,
 #   and which can be used, with the witnesses, to construct the variant graph
@@ -11,6 +12,9 @@ from itertools import permutations
 
 # Sample data
 witnessData = {'wit1': ['a', 'b', 'c', 'd', 'e'], 'wit2': ['a', 'e', 'c', 'd'], 'wit3': ['a', 'd', 'b']}
+bitArrays = {k:bitarray(len(witnessData[k])) for k in witnessData} # create a bitarray the length of each witness
+for item in bitArrays: # initialize bitarrays to all 0 values
+    bitArrays[item].setall(0)
 
 # Construct common sequence table (csTable) of all witnesses as dict
 # key is skip-bigram
@@ -48,6 +52,7 @@ for witOrder in witOrders:
                 floor = 0
                 ceiling = len(toList) - 1
                 modifyMe = None
+                bitArrays[siglum][offset] = 1 # record that we've processed this token
                 for dictPos in range(len(toList)):
                     currentDict = toList[dictPos]
                     if siglum not in currentDict.keys():  # this dictionary isn't relevant; check the next item in toList
@@ -77,3 +82,4 @@ for witOrder in witOrders:
     # for item in toList:
     #     print(item)
     print(witOrder, [item['norm'] for item in toList])
+    print(bitArrays)
