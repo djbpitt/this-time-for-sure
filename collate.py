@@ -54,10 +54,8 @@ for witOrder in witOrders:
                     currentDict = toList[dictPos]
                     if siglum not in currentDict.keys():  # this dictionary isn't relevant; check the next item in toList
                         pass
-                    else:
-                        if currentDict[siglum] == offset:  # the token is already in the list
-                            pass
-                        elif currentDict[siglum] < offset:
+                    else: # it can't be equal, since we used the bitarray to filter those out
+                        if currentDict[siglum] < offset:
                             floor = dictPos
                         else:
                             ceiling = dictPos
