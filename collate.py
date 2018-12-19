@@ -30,8 +30,8 @@ for witOrder in witOrders:
     #   order by 1) number of witnesses (numerical high to low) and 2) sequence (alphabetic low to high)
     csList = [k for k in sorted(csTable, key=lambda k: (-len(csTable[k]), k))]
     bitArrays = {k: bitarray(len(witnessData[k])) for k in witnessData}  # create a bitarray the length of each witness
-    for item in bitArrays:  # initialize bitarrays to all 0 values
-        bitArrays[item].setall(0)
+    for bitarray in bitArrays.values():  # initialize bitarrays to all 0 values
+        bitarray.setall(0)
 
     # Build topologically ordered list (toList)
     toList = []
@@ -52,9 +52,9 @@ for witOrder in witOrders:
                 modifyMe = None
                 for dictPos in range(len(toList)):
                     currentDict = toList[dictPos]
-                    if siglum not in currentDict.keys():  # this dictionary isn't relevant; check the next item in toList
+                    if siglum not in currentDict.keys():  # dictionary isn't relevant; check the next item in toList
                         pass
-                    else: # it can't be equal, since we used the bitarray to filter those out
+                    else:  # it can't be equal, since we used the bitarray to filter those out
                         if currentDict[siglum] < offset:
                             floor = dictPos
                         else:
@@ -73,7 +73,8 @@ for witOrder in witOrders:
                 else:
                     modifyMe[siglum] = offset
                 bitArrays[siglum][offset] = 1  # record that we've processed this token
-                print('added: ', norm, ' from ', skipgram, ' at ', location, ' with floor=', floor, ' and ceiling=', ceiling, sep='')
+                print('added: ', norm, ' from ', skipgram, ' at ', location,
+                      ' with floor=', floor, ' and ceiling=', ceiling, sep='')
     # for item in toList:
     #     print(item)
     print(witOrder, [item['norm'] for item in toList])
