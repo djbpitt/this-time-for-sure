@@ -73,8 +73,7 @@ for witOrder in witOrders:
                 else:
                     modifyMe[siglum] = offset
     # Diagnostic output
-    print('added: ', norm, ' from ', skipgram, ' at ', location, ' with floor=', floor, ' and ceiling=', ceiling, sep='')
-    for item in toList:
-        print(item)
-    print(witOrder)
-    print([item['norm'] for item in toList])
+    # print('added: ', norm, ' from ', skipgram, ' at ', location, ' with floor=', floor, ' and ceiling=', ceiling, sep='')
+    # for item in toList:
+    #     print(item)
+    print(witOrder, [item['norm'] for item in toList])
