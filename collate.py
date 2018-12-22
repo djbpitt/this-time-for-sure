@@ -13,32 +13,37 @@ from bitarray import bitarray
 # Sample data
 witnessData = {'wit1': ['a', 'b', 'c', 'd', 'e'], 'wit2': ['a', 'e', 'c', 'd'], 'wit3': ['a', 'd', 'b']}
 
-# Construct common sequence table (csTable) of all witnesses as dict
-# key is skip-bigram
-# value is list of (siglum, pos1, pos2) tuple, with positions of skipgram characters
-
 witOrders = list(permutations(['wit1', 'wit2', 'wit3']))
 for witOrder in witOrders:
+
+    ###
+    # Construct common sequence table (csTable) of all witnesses as dict
+    ###
+    # key is skip-bigram
+    # value is list of (siglum, pos1, pos2) tuple, with positions of skipgram characters
     csTable = collections.defaultdict(list)
     for key in witOrder:
         value = witnessData[key]
         for first in range(len(value)):
             for second in range(first + 1, len(value)):
                 csTable[(value[first], value[second])].append((key, first, second))
-
+    ###
     # Sort table into common sequence list (csList)
+    ###
     #   order by 1) number of witnesses (numerical high to low) and 2) sequence (alphabetic low to high)
     csList = [k for k in sorted(csTable, key=lambda k: (-len(csTable[k]), k))]
     bitArrays = {k: bitarray(len(witnessData[k])) for k in witnessData}  # create a bitarray the length of each witness
     for ba in bitArrays.values():  # initialize bitarrays to all 0 values
         ba.setall(0)
 
+    ###
     # Build topologically ordered list (toList)
+    ###
     toList = []
     toList.extend([{'norm': '#start'}, {'norm': '#end'}])
     for skipgram in csList:
         locations = csTable[skipgram]  # list of tuples of (siglum, location1, location2) for skipgram
-        norms = list(skipgram)  # two characters; TODO: will need to be changed when tokens are not single characters
+        norms = list(skipgram)  # two tokens
         for skipgramPos in range(len(norms)):  # loop over head and tail by position ([1, 2])
             norm = norms[skipgramPos]  # normalized value of token
             for location in locations:  # for each token, get witness and offset within witness
@@ -75,7 +80,32 @@ for witOrder in witOrders:
                 bitArrays[siglum][offset] = 1  # record that we've processed this token
                 # print('added: ', norm, ' from ', skipgram, ' at ', location,
                 #       ' with floor=', floor, ' and ceiling=', ceiling, sep='')
-    # for item in toList:
-    #     print(item)
-    print(witOrder, [item['norm'] for item in toList])
-    # print(bitArrays)
+    ###
+    # build list of edges for each witness
+    ###
+    edgeSets = {key: [] for key in witnessData}  # list of tuples of shape (source, target), both dictionaries
+    for node in toList:  # node is a dictionary with 'norm' and siglum keys; siglum values are offsets into the witness
+        if node['norm'] == '#start':  # not an edge target, so don’t add an edge
+            pass
+        elif node['norm'] == '#end':  # create edges for all witnesses; source is target of last edge, target is end
+            for key in witnessData:  # key is siglum
+                edgeSets[key].append((edgeSets[key][-1][1], toList[-1]))
+        else:
+            for key, value in node.items():
+                if key == 'norm':
+                    pass
+                else:
+                    try:  # target of last edge is source of new one, but only if the list isn't empty
+                        source = edgeSets[key][-1][1]
+                    except IndexError:  # if edgeSets[key] is empty, use the #start node as the source
+                        source = toList[0]
+                    edgeSets[key].append((source, node))
+    ###
+    # Diagnostic output
+    ###
+    print('witOrder =', witOrder)
+    # for values in edgeSets.values():
+    #     for edge in values:
+    #         print(edge)
+    allEdges = [edge for values in edgeSets.values() for edge in values]
+    print(allEdges)
