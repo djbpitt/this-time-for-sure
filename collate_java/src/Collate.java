@@ -21,7 +21,25 @@ class Collate {
         witnessData.put("wit1", Arrays.asList("a", "b", "c", "d", "e"));
         witnessData.put("wit2", Arrays.asList("a", "e", "c", "d"));
         witnessData.put("wit3", Arrays.asList("a", "d", "b"));
+        Map<String, List<Skipgram>> csTable = createCommonSequenceTable(witnessData);
+        List<String> csList = createCommonSequencePriorityList(csTable);
 
+        // Diagnostic output
+        for (String key : csList) {
+            System.out.println(key +" "+csTable.get(key));
+        }
+    }
+
+    static List<String> createCommonSequencePriorityList(Map<String, List<Skipgram>> csTable) {
+        // Sort table into common sequence list (csList)
+        //   ordered by 1) number of witnesses (numerica high to low) and 2) sequence (alphabetic low to high)
+        // csList = [k for k in sorted(csTable, key=lambda k: (-len(csTable[k]), k))]
+        Comparator<String> lengthComparator = Comparator.comparing(key -> -csTable.get(key).size());
+        Comparator<String> normalizedComparator = Comparator.comparing(key -> key);
+        return csTable.keySet().stream().sorted(lengthComparator.thenComparing(normalizedComparator)).collect(Collectors.toList());
+    }
+
+    static Map<String, List<Skipgram>> createCommonSequenceTable(Map<String, List<String>> witnessData) {
         // Construct common sequence table (csTable) of all witnesses as dict
         // key is skipbigram
         // value is list of (siglum, pos1, pos2) tuple, with positions of skipgram characters
@@ -35,18 +53,7 @@ class Collate {
                 }
             }
         }
-
-        // Sort table into common sequence list (csList)
-        //   ordered by 1) number of witnesses (numerica high to low) and 2) sequence (alphabetic low to high)
-        // csList = [k for k in sorted(csTable, key=lambda k: (-len(csTable[k]), k))]
-        Comparator<String> lengthComparator = Comparator.comparing(key -> -csTable.get(key).size());
-        Comparator<String> normalizedComparator = Comparator.comparing(key -> key);
-        List<String> csList = csTable.keySet().stream().sorted(lengthComparator.thenComparing(normalizedComparator)).collect(Collectors.toList());
-
-        // Diagnostic output
-        for (String key : csList) {
-            System.out.println(key +" "+csTable.get(key));
-        }
+        return csTable;
     }
 
     static class Skipgram {
