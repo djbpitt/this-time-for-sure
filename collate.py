@@ -2,16 +2,22 @@ import collections
 from itertools import permutations
 from bitarray import bitarray
 
+
 class Node(object):
     def __init__(self, norm):
-        self.tokendata = {} #  members are witness:offset pairs; not present for start and end tokens
+        self.tokendata = {}  # members are witness:offset pairs; not present for start and end tokens
         self.norm = norm
+        self.rank = None
+
     def __repr__(self):
         return self.norm
-    def __lt__(self, other): # make it sortable by norm value
+
+    def __lt__(self, other):  # make it sortable by norm value
         return self.norm < other.norm
+
     def add_location(self, siglum, offset):
         self.tokendata[siglum] = offset
+
 
 # Output: shortest common supersequence of witnesses, which is the same as the topological order,
 #   and which can be used, with the witnesses, to construct the variant graph
@@ -22,7 +28,9 @@ class Node(object):
 # TODO: At the moment we look only at skip-bigrams. Other lengths?
 
 # Sample data
-witnessData = {'wit1': ['a', 'b', 'c', 'd', 'e'], 'wit2': ['a', 'e', 'c', 'd'], 'wit3': ['a', 'd', 'b']}
+witnessData = {'wit1': ['a', 'b', 'c', 'd', 'e'],
+               'wit2': ['a', 'e', 'c', 'd'],
+               'wit3': ['a', 'd', 'b']}
 
 witOrders = list(permutations(['wit1', 'wit2', 'wit3']))
 for witOrder in witOrders:
@@ -65,7 +73,7 @@ for witOrder in witOrders:
                     break
                 floor = 0
                 ceiling = len(toList) - 1
-                modifyMe = None # existing toList entry to be modified; if None, create a new one
+                modifyMe = None  # existing toList entry to be modified; if None, create a new one
                 for dictPos in range(len(toList)):
                     currentDict = toList[dictPos].tokendata
                     if siglum not in currentDict.keys():  # dictionary isn't relevant; check the next item in toList
@@ -98,7 +106,7 @@ for witOrder in witOrders:
     ###
     # build list of edges for each witness
     ###
-    edgeSets = collections.defaultdict(list) #  key = siglum, value = list of (source, target) tuples
+    edgeSets = collections.defaultdict(list)  # key = siglum, value = list of (source, target) tuples
     for node in toList:  # token.norm is str; token.tokendata is dict with siglum:offset items
         if node.norm == '#start':  # not an edge target, so don’t add an edge
             pass
@@ -112,19 +120,36 @@ for witOrder in witOrders:
                 except IndexError:  # if edgeSets[key] is empty, use the #start node as the source
                     source = toList[0]
                 edgeSets[key].append((source, node))
+    edges = set(inner for outer in edgeSets.values() for inner in outer)  # tuples of Tokens
+
+    ###
+    # index from edge target to source for quicker retrieval when calculating rank
+    ###
+    findMySources = collections.defaultdict(list)
+    for edge in edges:
+        findMySources[edge[1]].append(edge[0])
+
+    ###
+    # Rank nodes in toList
+    ###
+    for item in toList:
+        inEdges = findMySources[item]
+        item.rank = max([r.rank for r in inEdges], default=-1) + 1
 
     ###
     # Diagnostic output
     ###
     print('---\n## witOrder =', witOrder)
-    print('## Input')
+    print('\n## Input')
     for item in witnessData.items():
         print(item)
-    print('## Nodes in topological order: ')
+    print('\n## Nodes in topological order (norm, tokendata, rank): ')
     for item in toList:
-        print(item, item.tokendata)
-    print('## Edges')
+        print(item, item.tokendata, item.rank)
+    print('\n## Edges')
     # merge witness-specific edge lists into single list
-    edges = set(inner for outer in edgeSets.values() for inner in outer)  # tuples of Tokens
     for edge in sorted(edges):
         print(edge[0].norm, edge[0].tokendata, '→', edge[1].norm, edge[1].tokendata)
+    print('\n## Edge target → sources (norm, tokendata, rank)')
+    for key, value in edges:
+        print(key, key.tokendata, key.rank, '→', value, value.tokendata, key.rank)
