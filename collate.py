@@ -99,19 +99,19 @@ for witOrder in witOrders:
     # build list of edges for each witness
     ###
     edgeSets = collections.defaultdict(list) #  key = siglum, value = list of (source, target) tuples
-    for token in toList:  # token.norm is str; token.tokendata is dict with siglum:offset items
-        if token.norm == '#start':  # not an edge target, so don’t add an edge
+    for node in toList:  # token.norm is str; token.tokendata is dict with siglum:offset items
+        if node.norm == '#start':  # not an edge target, so don’t add an edge
             pass
-        # elif node['norm'] == '#end':  # create edges for all witnesses; source is target of last edge, target is end
-        #     for key in witnessData:  # key is siglum
-        #         edgeSets[key].append((edgeSets[key][-1][1], toList[-1]))
+        elif node.norm == '#end':  # create edges for all witnesses; source is target of last edge, target is end
+            for edgeList in edgeSets.values():
+                edgeList.append((edgeList[-1][1], toList[-1]))
         else:
-            for key, value in token.tokendata.items():
+            for key, value in node.tokendata.items():
                 try:  # target of last edge is source of new one, but only if the list isn't empty
                     source = edgeSets[key][-1][1]
                 except IndexError:  # if edgeSets[key] is empty, use the #start node as the source
                     source = toList[0]
-                edgeSets[key].append((source, token))
+                edgeSets[key].append((source, node))
 
     ###
     # Diagnostic output
