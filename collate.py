@@ -3,7 +3,7 @@ from itertools import permutations
 from bitarray import bitarray
 
 class Node(object):
-    def __init__(self, norm=None):
+    def __init__(self, norm):
         self.tokendata = {} #  members are witness:offset pairs; not present for start and end tokens
         self.norm = norm
     def __repr__(self):
@@ -98,7 +98,7 @@ for witOrder in witOrders:
     ###
     # build list of edges for each witness
     ###
-    edgeSets = {key: [] for key in witnessData}  #  lists of witness-specific (source, target) tuples of Tokens
+    edgeSets = collections.defaultdict(list) #  key = siglum, value = list of (source, target) tuples
     for token in toList:  # token.norm is str; token.tokendata is dict with siglum:offset items
         if token.norm == '#start':  # not an edge target, so don’t add an edge
             pass
