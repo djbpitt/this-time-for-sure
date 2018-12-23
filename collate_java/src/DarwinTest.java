@@ -22,13 +22,13 @@ public class DarwinTest {
         witnessData.put("darwin1866", tokens2);
 
 
-        Map<String, List<Collate.Skipgram>> commonSequenceTable = Collate.createCommonSequenceTable(witnessData);
+        Map<List<String>, List<Collate.Skipgram>> commonSequenceTable = Collate.createCommonSequenceTable(witnessData);
 
-        List<String> commonSequencePriorityList = Collate.createCommonSequencePriorityList(commonSequenceTable);
+        List<List<String>> commonSequencePriorityList = Collate.createCommonSequencePriorityList(commonSequenceTable);
 
         // Diagnostic output
-        for (String key : commonSequencePriorityList) {
-            System.out.println(key +" "+commonSequenceTable.get(key));
+        for (List<String> key : commonSequencePriorityList) {
+            System.out.println(String.join(" ", key) +" "+commonSequenceTable.get(key));
         }
 
     }
