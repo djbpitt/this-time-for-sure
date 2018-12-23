@@ -132,9 +132,9 @@ for witOrder in witOrders:
     ###
     # Rank nodes in toList
     ###
-    for counter, value in enumerate(toList):
-        inEdges = findMySources[value]
-        value.rank = max([r.rank for r in inEdges], default=-1) + 1
+    for item in toList:
+        inEdges = findMySources[item]
+        item.rank = max([r.rank for r in inEdges], default=-1) + 1
 
     ###
     # Diagnostic output
