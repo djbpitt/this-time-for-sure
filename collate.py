@@ -122,7 +122,6 @@ for witOrder in witOrders:
                 edgeSets[key].append((edgeSourceByWitness[key], node))
                 edgeSourceByWitness[key] = node
     edges = set(inner for outer in edgeSets.values() for inner in outer)  # tuples of Tokens
-    print(edgeSourceByWitness)
     ###
     # index from edge target to source for calculating rank
     ###
@@ -151,28 +150,36 @@ for witOrder in witOrders:
     orderedSigla = sorted(witnessData.keys())
     table.add_column(None,[key for key in orderedSigla])
     for rank, nodes in nodesByRank.items():  # add a column for each rank
-        columnData = ['' for i in range(len(orderedSigla))]  # initialize column cells to the empty string
-        for node in nodes:
-            print(node.tokendata.keys())
+        columnTokens = {}
+        for node in nodes:  # copy tokens from all nodes at rank into a single dictionary; value is string (not offset)
+            for key in node.tokendata.keys():
+                columnTokens[key] = node.norm
+        columnData = []
+        for siglum in orderedSigla:
+            if siglum in columnTokens:
+                columnData.append(columnTokens[siglum])
+            else:
+                columnData.append('')
+        table.add_column(None, columnData)
     ###
     # Diagnostic output
     ###
-    print('---\n## witOrder =', witOrder)
-    print('\n## Input')
-    for item in witnessData.items():
-        print(item)
-    print('\n## Nodes in topological order (norm, tokendata, rank): ')
-    for item in toList:
-        print(item, item.tokendata, item.rank)
-    print('\n## Edges')
-    # merge witness-specific edge lists into single list
-    for edge in sorted(edges):
-        print(edge[0].norm, edge[0].tokendata, '→', edge[1].norm, edge[1].tokendata)
-    print('\n## Edge target → sources (norm, tokendata, rank)')
-    for key, value in edges:
-        print(key, key.tokendata, key.rank, '→', value, value.tokendata, key.rank)
-    print('\n## Nodes by rank')
-    for key, value in nodesByRank.items():
-        print(key, '→' ,value)
-    print('\n## At last! Alignment table')
+    # print('---\n## witOrder =', witOrder)
+    # print('\n## Input')
+    # for item in witnessData.items():
+    #     print(item)
+    # print('\n## Nodes in topological order (norm, tokendata, rank): ')
+    # for item in toList:
+    #     print(item, item.tokendata, item.rank)
+    # print('\n## Edges')
+    # # merge witness-specific edge lists into single list
+    # for edge in sorted(edges):
+    #     print(edge[0].norm, edge[0].tokendata, '→', edge[1].norm, edge[1].tokendata)
+    # print('\n## Edge target → sources (norm, tokendata, rank)')
+    # for key, value in edges:
+    #     print(key, key.tokendata, key.rank, '→', value, value.tokendata, key.rank)
+    # print('\n## Nodes by rank')
+    # for key, value in nodesByRank.items():
+    #     print(key, '→' ,value)
+    # print('\n## At last! Alignment table')
     print(table)
