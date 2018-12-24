@@ -147,13 +147,13 @@ for witOrder in witOrders:
     ###
     # Create alignment table
     ###
-    # table = PrettyTable(header=False)
-    # orderedSigla = sorted(witnessData.keys())
-    # table.add_column(None,[key for key in orderedSigla])
-    # for rank, nodes in nodesByRank.items():  # add a column for each rank
-    #     columnData = ['' for i in range(len(orderedSigla))]  # initialize column cells to the empty string
-    #     for node in nodes:
-    #         print(node.tokendata.keys())
+    table = PrettyTable(header=False)
+    orderedSigla = sorted(witnessData.keys())
+    table.add_column(None,[key for key in orderedSigla])
+    for rank, nodes in nodesByRank.items():  # add a column for each rank
+        columnData = ['' for i in range(len(orderedSigla))]  # initialize column cells to the empty string
+        for node in nodes:
+            print(node.tokendata.keys())
     ###
     # Diagnostic output
     ###
@@ -175,4 +175,4 @@ for witOrder in witOrders:
     for key, value in nodesByRank.items():
         print(key, '→' ,value)
     print('\n## At last! Alignment table')
-    # print(table)
+    print(table)
