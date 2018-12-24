@@ -110,12 +110,12 @@ for witOrder in witOrders:
     edgeSets = collections.defaultdict(list)  # key = siglum, value = list of node (source, target) tuples
     edgeSourceByWitness = {}  # last target will be next source
     for node in toList:  # token.norm is str; token.tokendata is dict with siglum:offset items
-        if node.norm == '#start':  # not an edge target, so don’t add an edge
+        if node.norm == '#start':  # not an edge target, so don’t add an edge, but set up source for next edge
             for siglum in witnessData:
                 edgeSourceByWitness[siglum] = node
-        elif node.norm == '#end':  # create edges for all witnesses
-            for edgeList in edgeSets.values():
-                edgeList.append((edgeList[-1][1], toList[-1]))
+        elif node.norm == '#end':  # create edges to #end for all witnesses
+            for siglum in witnessData:
+                edgeSets[siglum].append((edgeSourceByWitness[siglum], node))
         else:
             for key, value in node.tokendata.items():
                 # add next witness-specific edge, update value in edgeSourceByWitness
