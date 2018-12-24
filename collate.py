@@ -107,22 +107,22 @@ for witOrder in witOrders:
     ###
     # build list of edges for each witness
     ###
-    edgeSets = collections.defaultdict(list)  # key = siglum, value = list of (source, target) tuples
+    edgeSets = collections.defaultdict(list)  # key = siglum, value = list of node (source, target) tuples
+    edgeSourceByWitness = {}  # last target will be next source
     for node in toList:  # token.norm is str; token.tokendata is dict with siglum:offset items
         if node.norm == '#start':  # not an edge target, so don’t add an edge
-            pass
-        elif node.norm == '#end':  # create edges for all witnesses; source is target of last edge, target is end
+            for siglum in witnessData:
+                edgeSourceByWitness[siglum] = node
+        elif node.norm == '#end':  # create edges for all witnesses
             for edgeList in edgeSets.values():
                 edgeList.append((edgeList[-1][1], toList[-1]))
         else:
             for key, value in node.tokendata.items():
-                try:  # target of last edge is source of new one, but only if the list isn't empty
-                    source = edgeSets[key][-1][1]
-                except IndexError:  # if edgeSets[key] is empty, use the #start node as the source
-                    source = toList[0]
-                edgeSets[key].append((source, node))
+                # add next witness-specific edge, update value in edgeSourceByWitness
+                edgeSets[key].append((edgeSourceByWitness[key], node))
+                edgeSourceByWitness[key] = node
     edges = set(inner for outer in edgeSets.values() for inner in outer)  # tuples of Tokens
-
+    print(edgeSourceByWitness)
     ###
     # index from edge target to source for calculating rank
     ###
@@ -145,37 +145,34 @@ for witOrder in witOrders:
         nodesByRank[node.rank].append(node)
 
     ###
-    # Output alignment table
+    # Create alignment table
     ###
-    table = PrettyTable(header=False)
-    orderedSigla = sorted(witnessData.keys())
-    table.add_column(None,[key for key in orderedSigla])
-    for rank,nodes in nodesByRank.items(): # add a column for each rank
-        print('Now in rank', rank)
-        columnData = ['' for i in range(len(orderedSigla))]
-        print(len(columnData))
-        for node in nodes:
-            print(node.tokendata.keys())
-    print(table)
+    # table = PrettyTable(header=False)
+    # orderedSigla = sorted(witnessData.keys())
+    # table.add_column(None,[key for key in orderedSigla])
+    # for rank, nodes in nodesByRank.items():  # add a column for each rank
+    #     columnData = ['' for i in range(len(orderedSigla))]  # initialize column cells to the empty string
+    #     for node in nodes:
+    #         print(node.tokendata.keys())
     ###
     # Diagnostic output
     ###
-    # print('---\n## witOrder =', witOrder)
-    # print('\n## Input')
-    # for item in witnessData.items():
-    #     print(item)
-    # print('\n## Nodes in topological order (norm, tokendata, rank): ')
-    # for item in toList:
-    #     print(item, item.tokendata, item.rank)
-    # print('\n## Edges')
-    # # merge witness-specific edge lists into single list
-    # for edge in sorted(edges):
-    #     print(edge[0].norm, edge[0].tokendata, '→', edge[1].norm, edge[1].tokendata)
-    # print('\n## Edge target → sources (norm, tokendata, rank)')
-    # for key, value in edges:
-    #     print(key, key.tokendata, key.rank, '→', value, value.tokendata, key.rank)
-    # print('\n## Nodes by rank')
-    # for key, value in nodesByRank.items():
-    #     print(key, '→' ,value)
-    # print('\n## At last! Alignment table')
+    print('---\n## witOrder =', witOrder)
+    print('\n## Input')
+    for item in witnessData.items():
+        print(item)
+    print('\n## Nodes in topological order (norm, tokendata, rank): ')
+    for item in toList:
+        print(item, item.tokendata, item.rank)
+    print('\n## Edges')
+    # merge witness-specific edge lists into single list
+    for edge in sorted(edges):
+        print(edge[0].norm, edge[0].tokendata, '→', edge[1].norm, edge[1].tokendata)
+    print('\n## Edge target → sources (norm, tokendata, rank)')
+    for key, value in edges:
+        print(key, key.tokendata, key.rank, '→', value, value.tokendata, key.rank)
+    print('\n## Nodes by rank')
+    for key, value in nodesByRank.items():
+        print(key, '→' ,value)
+    print('\n## At last! Alignment table')
     # print(table)
