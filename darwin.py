@@ -28,7 +28,6 @@ class Node(object):
 # Assumption: Align deepest matches first
 
 # TODO: Single-token witnesses are not processed because they have no bigrams; this is an error
-# TODO: Should we place non-repeated tokens first?
 # TODO: At the moment we look only at skip-bigrams. Other lengths?
 
 # Sample data
@@ -37,7 +36,7 @@ witnessData = {}
 for filename in glob.glob(os.path.join('darwin/chapter_1_paragraph_1', '*.txt')):
     siglum = yearRegex.search(filename).group(1)
     with open(filename, 'r') as f:
-        witnessData[siglum] = f.read().split()[:25]  # first 25 words from each witness
+        witnessData[siglum] = f.read().split()  # first 25 words from each witness
 
 ###
 # Construct common sequence table (csTable) of all witnesses as dict
@@ -53,13 +52,13 @@ for key, value in witnessData.items():
 ###
 # Sort table into common sequence list (csList; just bigrams, without witness data)
 ###
-# sort by depth, then by uniqueness = depth / frequency
-
-#   order by 1) number of witnesses (numerical high to low) and 2) sequence (alphabetic low to high)
-csList = [k for k in sorted(csTable, key = lambda k: (-len({item[0] for item in csTable[k]}), # depth (number of witnesses)
-                         -len({item[0] for item in csTable[k]}) / len(csTable[k]), # uniqueness (depth/frequency)
-                        k # alphabetical
-                         ))]
+# sort by depth (high to low), then by uniqueness = depth / frequency, then alphabetically
+csList = [k for k in
+          sorted(csTable, key=lambda k: (-len({entry[0] for entry in csTable[k]}),  # depth (number of witnesses)
+                                         -len({entry[0] for entry in csTable[k]}) / len(csTable[k]),
+                                         # uniqueness (depth/frequency)
+                                         k  # alphabetical
+                                         ))]
 bitArrays = {k: bitarray(len(witnessData[k])) for k in witnessData}  # create a bitarray the length of each witness
 for ba in bitArrays.values():  # initialize bitarrays to all 0 values
     ba.setall(0)
@@ -160,7 +159,7 @@ for node in toList:
 # ###
 table = PrettyTable(header=False)
 orderedSigla = sorted(witnessData.keys())
-table.add_column(None,[key for key in orderedSigla])
+table.add_column(None, [key for key in orderedSigla])
 for rank, nodes in nodesByRank.items():  # add a column for each rank
     columnTokens = {}
     for node in nodes:  # copy tokens from all nodes at rank into a single dictionary; value is string (not offset)
