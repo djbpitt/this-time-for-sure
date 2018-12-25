@@ -59,6 +59,24 @@ class Collate {
         return csTable;
     }
 
+    static Map<List<String>, Float> analyse(Map<List<String>, List<Collate.Skipgram>> commonSequenceTable) {
+        Map<List<String>, Float> uniqunessValuePerNormalizedBigram = new HashMap<>();
+        for (List<String> normalizedBigram : commonSequenceTable.keySet()) {
+            // it might be better to go over the entries instead, oh well, later
+            List<Collate.Skipgram> skipgrams = commonSequenceTable.get(normalizedBigram);
+            // we have to count the number of different witnesses this normalized skipgram occurs in.
+            // We do that by creating of a set of all the witness identifiers the skipgrams that this key is associated with
+            Set<String> witnessIds = new HashSet<>();
+            for (Collate.Skipgram skipgram : skipgrams) {
+                witnessIds.add(skipgram.witnessId);
+            }
+            Float result = (float) witnessIds.size() / skipgrams.size();
+            uniqunessValuePerNormalizedBigram.put(normalizedBigram, result);
+        }
+        return uniqunessValuePerNormalizedBigram;
+    }
+
+
     static class Skipgram {
         String witnessId;
         int first;
