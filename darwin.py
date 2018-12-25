@@ -1,9 +1,10 @@
-import os, glob
-import re
 import collections
-from itertools import permutations
+import glob
+import os
+import re
+from prettytable import PrettyTable
+
 from bitarray import bitarray
-from prettytable import PrettyTable # not part of anaconda distribution; install with pip
 
 
 class Node(object):
@@ -31,7 +32,7 @@ class Node(object):
 # TODO: At the moment we look only at skip-bigrams. Other lengths?
 
 # Sample data
-yearRegex = re.compile('(\d{4})')
+yearRegex = re.compile(r'(\d{4})')
 witnessData = {}
 for filename in glob.glob(os.path.join('darwin/chapter_1_paragraph_1', '*.txt')):
     siglum = yearRegex.search(filename).group(1)
@@ -44,7 +45,7 @@ for filename in glob.glob(os.path.join('darwin/chapter_1_paragraph_1', '*.txt'))
 # key is skip-bigram
 # value is list of (siglum, pos1, pos2) tuple, with positions of skipgram characters
 csTable = collections.defaultdict(list)
-for key,value in witnessData.items():
+for key, value in witnessData.items():
     for first in range(len(value)):
         for second in range(first + 1, len(value)):
             csTable[(value[first], value[second])].append((key, first, second))
@@ -52,8 +53,13 @@ for key,value in witnessData.items():
 ###
 # Sort table into common sequence list (csList; just bigrams, without witness data)
 ###
+# sort by depth, then by uniqueness = depth / frequency
+
 #   order by 1) number of witnesses (numerical high to low) and 2) sequence (alphabetic low to high)
-csList = [k for k in sorted(csTable, key=lambda k: (-len(csTable[k]), k))]
+csList = [k for k in sorted(csTable, key = lambda k: (-len({item[0] for item in csTable[k]}), # depth (number of witnesses)
+                         -len({item[0] for item in csTable[k]}) / len(csTable[k]), # uniqueness (depth/frequency)
+                        k # alphabetical
+                         ))]
 bitArrays = {k: bitarray(len(witnessData[k])) for k in witnessData}  # create a bitarray the length of each witness
 for ba in bitArrays.values():  # initialize bitarrays to all 0 values
     ba.setall(0)
@@ -73,7 +79,7 @@ for skipgram in csList:
             offset = location[skipgramPos + 1]  # offset of token within witness
             if bitArrays[siglum][offset] == 1:
                 # print('skipping: ', norm, ' from ', skipgram, ' at ', location)
-                break
+                continue
             floor = 0
             ceiling = len(toList) - 1
             modifyMe = None  # existing toList entry to be modified; if None, create a new one
@@ -106,64 +112,68 @@ for skipgram in csList:
             # print('added: ', norm, ' from ', skipgram, ' at ', location,
             #       ' with floor=', floor, ' and ceiling=', ceiling, sep='')
 
-print(toList)
 # ###
 # # build list of edges for each witness
 # ###
-# edgeSets = collections.defaultdict(list)  # key = siglum, value = list of node (source, target) tuples
-# edgeSourceByWitness = {}  # last target will be next source
-# for node in toList:  # token.norm is str; token.tokendata is dict with siglum:offset items
-#     if node.norm == '#start':  # not an edge target, so don’t add an edge, but set up source for next edge
-#         for siglum in witnessData:
-#             edgeSourceByWitness[siglum] = node
-#     elif node.norm == '#end':  # create edges to #end for all witnesses
-#         for siglum in witnessData:
-#             edgeSets[siglum].append((edgeSourceByWitness[siglum], node))
-#     else:
-#         for key, value in node.tokendata.items():
-#             # add next witness-specific edge, update value in edgeSourceByWitness
-#             edgeSets[key].append((edgeSourceByWitness[key], node))
-#             edgeSourceByWitness[key] = node
-# edges = set(inner for outer in edgeSets.values() for inner in outer)  # tuples of Tokens
-# ###
-# # index from edge target to source for calculating rank
-# ###
-# findMySources = collections.defaultdict(list)
-# for edge in edges:
-#     findMySources[edge[1]].append(edge[0])
-#
-# ###
-# # Rank nodes in toList
-# ###
-# for item in toList:
-#     inEdges = findMySources[item]
-#     item.rank = max([r.rank for r in inEdges], default=-1) + 1
-#
-# ###
-# # index from rank to nodes for retrieval when building table by columns/ranks
-# ###
-# nodesByRank = collections.defaultdict(list)
-# for node in toList:
-#     nodesByRank[node.rank].append(node)
-#
+edgeSets = collections.defaultdict(list)  # key = siglum, value = list of node (source, target) tuples
+edgeSourceByWitness = {}  # last target will be next source
+for node in toList:  # token.norm is str; token.tokendata is dict with siglum:offset items
+    if node.norm == '#start':  # not an edge target, so don’t add an edge, but set up source for next edge
+        for siglum in witnessData:
+            edgeSourceByWitness[siglum] = node
+    elif node.norm == '#end':  # create edges to #end for all witnesses
+        for siglum in witnessData:
+            edgeSets[siglum].append((edgeSourceByWitness[siglum], node))
+    else:
+        for key, value in node.tokendata.items():
+            # add next witness-specific edge, update value in edgeSourceByWitness
+            edgeSets[key].append((edgeSourceByWitness[key], node))
+            edgeSourceByWitness[key] = node
+edges = set(inner for outer in edgeSets.values() for inner in outer)  # tuples of Tokens
+
+###
+# index from edge target to source for calculating rank
+###
+findMySources = collections.defaultdict(list)
+for edge in edges:
+    findMySources[edge[1]].append(edge[0])
+
+###
+# Rank nodes in toList
+###
+for item in toList:
+    inEdges = findMySources[item]
+    item.rank = max([r.rank for r in inEdges], default=-1) + 1
+
+###
+# index from rank to nodes for retrieval when building table by columns/ranks
+###
+nodesByRank = collections.defaultdict(list)
+for node in toList:
+    nodesByRank[node.rank].append(node)
+
+# for key, value in nodesByRank.items():
+#     print(key, [(item.norm, item.tokendata) for item in value])
+
 # ###
 # # Create alignment table
 # ###
-# table = PrettyTable(header=False)
-# orderedSigla = sorted(witnessData.keys())
-# table.add_column(None,[key for key in orderedSigla])
-# for rank, nodes in nodesByRank.items():  # add a column for each rank
-#     columnTokens = {}
-#     for node in nodes:  # copy tokens from all nodes at rank into a single dictionary; value is string (not offset)
-#         for key in node.tokendata.keys():
-#             columnTokens[key] = node.norm
-#     columnData = []
-#     for siglum in orderedSigla:
-#         if siglum in columnTokens:
-#             columnData.append(columnTokens[siglum])
-#         else:
-#             columnData.append('')
-#     table.add_column(None, columnData)
+table = PrettyTable(header=False)
+orderedSigla = sorted(witnessData.keys())
+table.add_column(None,[key for key in orderedSigla])
+for rank, nodes in nodesByRank.items():  # add a column for each rank
+    columnTokens = {}
+    for node in nodes:  # copy tokens from all nodes at rank into a single dictionary; value is string (not offset)
+        for key in node.tokendata.keys():
+            columnTokens[key] = node.norm
+    columnData = []
+    for siglum in orderedSigla:
+        if siglum in columnTokens:
+            columnData.append(columnTokens[siglum])
+        else:
+            columnData.append('')
+    table.add_column(None, columnData)
+
 # ###
 # # Diagnostic output
 # ###
@@ -185,4 +195,4 @@ print(toList)
 # # for key, value in nodesByRank.items():
 # #     print(key, '→' ,value)
 # # print('\n## At last! Alignment table')
-# print(table)
+print(table)
