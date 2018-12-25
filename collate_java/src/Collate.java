@@ -31,6 +31,26 @@ class Collate {
     }
 
     static List<List<String>> createCommonSequencePriorityList(Map<List<String>, List<Skipgram>> csTable) {
+        // Sort the common table into a common sequence priority list
+        // ordered by 1) number of witnesses (numerica high to low),
+        //            2) by uniqueness of the sequence (high to low),
+        //            3) alphabetic (low to high, a-z)
+
+        // calculate uniqueness for each of the sequences.
+        // NOTE: Some design notes follow
+        // I could also provide the uniquess fadctor sepearat;y
+        // But then that would make things more complicated.
+        // If I make the return value of this method a bit more complicated
+        // so that the uniqueness factor is included in the result.
+        // Or I could create a method that creates an extended version of the common sequence table
+        // with the uniqueness factor included in the keys.
+        // For now I could also calculate the uniqueness factor twice.
+
+        Map<List<String>, AnalyticResult> uniquenessFactorMap = analyse(csTable);
+
+     //   Comparator<List<String>>
+
+
         // Sort table into common sequence list (csList)
         //   ordered by 1) number of witnesses (numerica high to low) and 2) sequence (alphabetic low to high)
         // csList = [k for k in sorted(csTable, key=lambda k: (-len(csTable[k]), k))]
@@ -59,8 +79,10 @@ class Collate {
         return csTable;
     }
 
-    static Map<List<String>, Float> analyse(Map<List<String>, List<Collate.Skipgram>> commonSequenceTable) {
-        Map<List<String>, Float> uniqunessValuePerNormalizedBigram = new HashMap<>();
+    // This thing should return the depth as well as the uniqueness of each key
+
+    static Map<List<String>, AnalyticResult> analyse(Map<List<String>, List<Collate.Skipgram>> commonSequenceTable) {
+        Map<List<String>, AnalyticResult> uniqunessValuePerNormalizedBigram = new HashMap<>();
         for (List<String> normalizedBigram : commonSequenceTable.keySet()) {
             // it might be better to go over the entries instead, oh well, later
             List<Collate.Skipgram> skipgrams = commonSequenceTable.get(normalizedBigram);
@@ -70,12 +92,23 @@ class Collate {
             for (Collate.Skipgram skipgram : skipgrams) {
                 witnessIds.add(skipgram.witnessId);
             }
-            Float result = (float) witnessIds.size() / skipgrams.size();
-            uniqunessValuePerNormalizedBigram.put(normalizedBigram, result);
+            AnalyticResult analyticResult = new AnalyticResult();
+            analyticResult.uniqueness = (float) witnessIds.size() / skipgrams.size();
+            analyticResult.depth = witnessIds.size();
+            uniqunessValuePerNormalizedBigram.put(normalizedBigram, analyticResult);
         }
         return uniqunessValuePerNormalizedBigram;
     }
 
+    static class AnalyticResult {
+        int depth; // number of witnesses a pattern occurs in.
+        float uniqueness; // 1 means pattern is completely uniqueness with a witness
+
+        @Override
+        public String toString() {
+            return depth+":"+uniqueness;
+        }
+    }
 
     static class Skipgram {
         String witnessId;

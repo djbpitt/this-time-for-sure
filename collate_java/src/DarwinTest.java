@@ -25,7 +25,7 @@ public class DarwinTest {
         Map<List<String>, List<Collate.Skipgram>> commonSequenceTable = Collate.createCommonSequenceTable(witnessData);
 
         // We create a function that calculates the uniqueness of each key in the common sequence table
-        Map<List<String>, Float> uniquenessFactor = Collate.analyse(commonSequenceTable);
+        Map<List<String>, Collate.AnalyticResult> uniquenessFactor = Collate.analyse(commonSequenceTable);
 
 
         // the reasoning during the creation of the priority list is too simple
@@ -34,7 +34,7 @@ public class DarwinTest {
 
         // Diagnostic output
         for (List<String> key : commonSequencePriorityList) {
-            System.out.println(String.join(" ", key) + " " + commonSequenceTable.get(key));
+            System.out.println(String.join(" ", key) + " " + uniquenessFactor.get(key)+" "+commonSequenceTable.get(key));
         }
 
     }
