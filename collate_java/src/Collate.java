@@ -46,18 +46,16 @@ class Collate {
         // with the uniqueness factor included in the keys.
         // For now I could also calculate the uniqueness factor twice.
 
+
+        // some decision making notes:
+        // in case of low depth and low uniqueness it is not really sure which one is the better parameter to work with
         Map<List<String>, AnalyticResult> uniquenessFactorMap = analyse(csTable);
 
-     //   Comparator<List<String>>
-
-
-        // Sort table into common sequence list (csList)
-        //   ordered by 1) number of witnesses (numerica high to low) and 2) sequence (alphabetic low to high)
-        // csList = [k for k in sorted(csTable, key=lambda k: (-len(csTable[k]), k))]
-        Comparator<List<String>> lengthComparator = Comparator.comparing(key -> -csTable.get(key).size());
+        Comparator<List<String>> depthComparator = Comparator.comparing(key -> -uniquenessFactorMap.get(key).depth);
+        Comparator<List<String>> uniquenessComparator = Comparator.comparing(key -> -uniquenessFactorMap.get(key).uniqueness);
         // NOTE: converting the array into a String is a bit ugly
         Comparator<List<String>> normalizedComparator = Comparator.comparing(key -> key.get(0)+";"+key.get(1));
-        return csTable.keySet().stream().sorted(lengthComparator.thenComparing(normalizedComparator)).collect(Collectors.toList());
+        return csTable.keySet().stream().sorted(depthComparator.thenComparing(uniquenessComparator).thenComparing(normalizedComparator)).collect(Collectors.toList());
     }
 
     static Map<List<String>, List<Skipgram>> createCommonSequenceTable(Map<String, List<String>> witnessData) {
