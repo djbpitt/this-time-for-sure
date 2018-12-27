@@ -52,9 +52,14 @@ public class VariantGraphCreator {
         Node(String normalized) {
             this.normalized = normalized;
         }
+
+        @Override
+        public String toString() {
+            return normalized;
+        }
     }
 
-    List<VariantGraphCreator.Node> initList() {
+    static List<VariantGraphCreator.Node> initList() {
         List<VariantGraphCreator.Node> verticesListInTopologicalOrder = new ArrayList<>();
         verticesListInTopologicalOrder.add(new Node("# start"));
         verticesListInTopologicalOrder.add(new Node("# end"));
@@ -63,7 +68,7 @@ public class VariantGraphCreator {
 
     // a witness is supplied
     // Token is a witness id plus a pointer to a location within a witness
-    void insertTokenInVariantGraph(List<Node> verticesListInTopologicalOrder, String witnessId, int position, String value) {
+    static void insertTokenInVariantGraph(List<Node> verticesListInTopologicalOrder, String witnessId, int position, String value) {
         // This method should return two vertices: one that is higher than the one we want to insert
         // and one that is lower.
         int lower = 0; // start node
@@ -76,7 +81,7 @@ public class VariantGraphCreator {
         for (int pos = lower +1; pos < higher; pos++) {
             Node v = verticesListInTopologicalOrder.get(pos);
             // Rule 1: If V does not contain the witness that we are looking for then skip
-            if (v.witnessIdToPosition.containsKey(witnessId)) {
+            if (!v.witnessIdToPosition.containsKey(witnessId)) {
                 continue;
             }
             // Do the actual token comparison
@@ -157,7 +162,7 @@ public class VariantGraphCreator {
      * This maybe confusing to callers of this method
      * Although of course this is a private method.
      */
-    private void createVertexForTokenInsertBefore(String witnessId, int position, String value, int higher, List<Node> verticesListInTopologicalOrder) {
+    private static void createVertexForTokenInsertBefore(String witnessId, int position, String value, int higher, List<Node> verticesListInTopologicalOrder) {
         Node node = new Node(value);
         node.witnessIdToPosition.put(witnessId, position);
         verticesListInTopologicalOrder.add(higher, node);

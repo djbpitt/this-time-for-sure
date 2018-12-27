@@ -37,7 +37,39 @@ public class DarwinTest {
             System.out.println(String.join(" ", key) + " " + uniquenessFactor.get(key)+" "+commonSequenceTable.get(key));
         }
 
+        // we create the topological ordered list
+        // by selecting one skip bigram from the common sequence priority list
+        List<VariantGraphCreator.Node> topologicalList = VariantGraphCreator.initList();
+
+
+        for (List<String> normalizedBigram : commonSequencePriorityList) {
+           // get the actual bigrams from the CST
+            List<Collate.Skipgram> skipgrams = commonSequenceTable.get(normalizedBigram);
+
+            for(Collate.Skipgram skipgram : skipgrams) {
+                selectSkipgram(skipgram, witnessData, topologicalList);
+            }
+        }
+
+        System.out.println(topologicalList);
+
+
     }
+
+    private void selectSkipgram(Collate.Skipgram skipgram, Map<String, List<String>> witnessData, List<VariantGraphCreator.Node> topologicalList) {
+        // we must look for the location where to insert the vertex
+        // we have to get the tokens out of the bigram
+        // this method has to be called twice. Once for each token in the skipgram
+        String witnessId = skipgram.witnessId;
+        int position = skipgram.first;
+        String value = witnessData.get(witnessId).get(position);
+        VariantGraphCreator.insertTokenInVariantGraph(topologicalList, witnessId, position, value);
+
+        position = skipgram.second;
+        value = witnessData.get(witnessId).get(position);
+        VariantGraphCreator.insertTokenInVariantGraph(topologicalList, witnessId, position, value);
+    }
+
 
     // We split on whitespace for now
     // This could be improved later.
