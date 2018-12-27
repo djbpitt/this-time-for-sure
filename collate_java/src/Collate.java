@@ -69,6 +69,9 @@ class Collate {
 
         System.out.println(topologicalList);
 
+        Map<VariantGraphCreator.Node, List<VariantGraphCreator.Node>> nodeListMap = Collate.addEdges(topologicalList);
+
+        System.out.println(nodeListMap);
 
 
     }
@@ -98,13 +101,16 @@ class Collate {
         witnessData.put("wit1", Arrays.asList("a", "b", "c", "d", "e"));
         witnessData.put("wit2", Arrays.asList("a", "e", "c", "d"));
         witnessData.put("wit3", Arrays.asList("a", "d", "b"));
-        Map<List<String>, List<Skipgram>> csTable = createCommonSequenceTable(witnessData);
-        List<List<String>> csList = createCommonSequencePriorityList(csTable);
 
-        // Diagnostic output
-        for (List<String> key : csList) {
-            System.out.println(key +" "+csTable.get(key));
-        }
+        collate(witnessData);
+
+//        Map<List<String>, List<Skipgram>> csTable = createCommonSequenceTable(witnessData);
+//        List<List<String>> csList = createCommonSequencePriorityList(csTable);
+//
+//        // Diagnostic output
+//        for (List<String> key : csList) {
+//            System.out.println(key +" "+csTable.get(key));
+//        }
     }
 
     static List<List<String>> createCommonSequencePriorityList(Map<List<String>, List<Skipgram>> csTable) {
@@ -174,6 +180,59 @@ class Collate {
         }
         return uniqunessValuePerNormalizedBigram;
     }
+
+
+    public static Map<VariantGraphCreator.Node, List<VariantGraphCreator.Node>> addEdges(List<VariantGraphCreator.Node> verticesListInTopologicalOrder) {
+        /* We traverse over the topological order list
+         * Of course skip the start node
+         * then for every node...
+         *
+         * We should maybe first clear the incoming and outgoing edges when we first visit a node
+         * That way we can use this code to visualize multiple partial variant graphs.
+         */
+        /*
+         * The clearing out we do later on...
+         */
+
+        // we find a vertex
+        // the vertex contains tokens for one or more witnesses
+        // now each of these witnesses need to have a valid path
+        // from the previous vertex of that witness to the current vertex.
+        // so we create a map that contains the last seen vertex for eahc witness
+        // at the start that is of course the start vertex.
+        Map<String, VariantGraphCreator.Node> witnessToLastVertexMap = new HashMap<>();
+        Map<VariantGraphCreator.Node, List<VariantGraphCreator.Node>> adjacencyList = new HashMap<>();
+
+        for (VariantGraphCreator.Node v : verticesListInTopologicalOrder) {
+            // skip the start vertex
+            if (v == verticesListInTopologicalOrder.get(0)) {
+                continue;
+            }
+            // NOTE: oh the end vertex has no tokens
+            if (v == verticesListInTopologicalOrder.get(verticesListInTopologicalOrder.size()-1)) {
+                for (Map.Entry<String,VariantGraphCreator.Node> witnessIdToPreviousVertexEntry : witnessToLastVertexMap.entrySet()) {
+                    String witness = witnessIdToPreviousVertexEntry.getKey();
+                    VariantGraphCreator.Node pre = witnessIdToPreviousVertexEntry.getValue();
+                    adjacencyList.computeIfAbsent(pre, e->new ArrayList<VariantGraphCreator.Node>()).add(v);
+                }
+                break;
+            }
+
+//            // remove all the existing relations on this vertex.
+//            v.clear();
+
+            // nu moet ik alle tokens van een vertex af gaan om te kijken welke witnesses er allemaal
+            // op staan.
+            for (String witness : v.witnessIdToPosition.keySet()) {
+                VariantGraphCreator.Node previous = witnessToLastVertexMap.getOrDefault(witness, verticesListInTopologicalOrder.get(0));
+                // NOTE: a set might be better, because multiple witnesses might have the same node, node connections
+                adjacencyList.computeIfAbsent(previous, e->new ArrayList<>()).add(v);
+                witnessToLastVertexMap.put(witness, v);
+            }
+        }
+        return adjacencyList;
+    }
+
 
     static class AnalyticResult {
         int depth; // number of witnesses a pattern occurs in.
