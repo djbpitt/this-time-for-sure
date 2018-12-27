@@ -3,6 +3,7 @@ import glob
 import os
 import re
 from prettytable import PrettyTable
+import operator
 
 from bitarray import bitarray
 
@@ -23,6 +24,27 @@ class Node(object):
         self.tokendata[siglum] = offset
 
 
+def generate_skipgrams(data: dict, skip: int = 5, length: int = 2) -> dict:
+    """Return common sequence table for skip-ngrams.
+
+    Keyword arguments:
+        data -- dictionary with siglum as key and list of tokens as values
+        skip -- maximum skip size (default to 5; other legal values are non-negative integers)
+        length -- size of ngram (default to 2 for bigram)
+
+    Return:
+        csTable -- dictionary:
+            key is tuple of skipgram tokens
+            value is list of tuples of (siglum, offset of first token, offset of ...)
+    """
+    csTable = collections.defaultdict(list)
+    for key, value in data.items():
+        for first in range(len(value) - skip):
+            for second in range(first + 1, first + skip + 1):
+                csTable[(value[first], value[second])].append((key, first, second))
+    return csTable
+
+
 # Output: shortest common supersequence of witnesses, which is the same as the topological order,
 #   and which can be used, with the witnesses, to construct the variant graph
 # Assumption: Align deepest matches first
@@ -30,24 +52,39 @@ class Node(object):
 # TODO: Single-token witnesses are not processed because they have no bigrams; this is an error
 # TODO: At the moment we look only at skip-bigrams. Other lengths?
 
-# Sample data
+# Sample data 1: Darwin (repetition, no transposition)
 yearRegex = re.compile(r'(\d{4})')
 witnessData = {}
-for filename in glob.glob(os.path.join('darwin/chapter_1_paragraph_1', '*.txt')):
+for filename in glob.glob(os.path.join('darwin/chapter_1', '*.txt')):
     siglum = yearRegex.search(filename).group(1)
     with open(filename, 'r') as f:
-        witnessData[siglum] = f.read().split()  # first 25 words from each witness
+        witnessData[siglum] = f.read().split()[:150]  # slice to limit word count
+
+# Sample data 2: transposition, no repetition
+# witnessData = {'wit1': ['a', 'b', 'c', 'd', 'e'],
+#                'wit2': ['a', 'e', 'c', 'd'],
+#                'wit3': ['a', 'd', 'b']}
 
 ###
 # Construct common sequence table (csTable) of all witnesses as dict
 ###
-# key is skip-bigram
-# value is list of (siglum, pos1, pos2) tuple, with positions of skipgram characters
-csTable = collections.defaultdict(list)
-for key, value in witnessData.items():
-    for first in range(len(value)):
-        for second in range(first + 1, len(value)):
-            csTable[(value[first], value[second])].append((key, first, second))
+csTable = generate_skipgrams(data=witnessData, skip=1, length=2)
+
+# Diagnostic output
+x = PrettyTable()
+x.field_names = ["First", "Second", "Uniqueness", "Depth", "Frequency"]
+x.align["First"] = "l"
+x.align["Second"] = "l"
+x.align["Uniqueness"] = "r"
+x.align["Depth"] = "r"
+x.align["Frequency"] = "r"
+for key, value in csTable.items():
+    first, second = key
+    frequency = len(value)
+    depth = len({item[0] for item in csTable[key]})
+    uniqueness = "{0:.4f}".format(depth / frequency)
+    x.add_row([first, second, uniqueness, depth, frequency])
+print(x.get_string(sort_key=operator.itemgetter(3, 4), sortby="First"))
 
 ###
 # Sort table into common sequence list (csList; just bigrams, without witness data)
@@ -59,6 +96,10 @@ csList = [k for k in
                                          # uniqueness (depth/frequency)
                                          k  # alphabetical
                                          ))]
+
+###
+# bitArrays tracks the tokens we've already placed
+###
 bitArrays = {k: bitarray(len(witnessData[k])) for k in witnessData}  # create a bitarray the length of each witness
 for ba in bitArrays.values():  # initialize bitarrays to all 0 values
     ba.setall(0)
@@ -173,25 +214,25 @@ for rank, nodes in nodesByRank.items():  # add a column for each rank
             columnData.append('')
     table.add_column(None, columnData)
 
-# ###
-# # Diagnostic output
-# ###
-# # print('---\n## witOrder =', witOrder)
-# # print('\n## Input')
-# # for item in witnessData.items():
-# #     print(item)
-# # print('\n## Nodes in topological order (norm, tokendata, rank): ')
-# # for item in toList:
-# #     print(item, item.tokendata, item.rank)
-# # print('\n## Edges')
-# # # merge witness-specific edge lists into single list
-# # for edge in sorted(edges):
-# #     print(edge[0].norm, edge[0].tokendata, '→', edge[1].norm, edge[1].tokendata)
-# # print('\n## Edge target → sources (norm, tokendata, rank)')
-# # for key, value in edges:
-# #     print(key, key.tokendata, key.rank, '→', value, value.tokendata, key.rank)
-# # print('\n## Nodes by rank')
-# # for key, value in nodesByRank.items():
-# #     print(key, '→' ,value)
-# # print('\n## At last! Alignment table')
-print(table)
+###
+# Diagnostic output
+###
+# print('---\n## witOrder =', witOrder)
+# print('\n## Input')
+# for item in witnessData.items():
+#     print(item)
+# print('\n## Nodes in topological order (norm, tokendata, rank): ')
+# for item in toList:
+#     print(item, item.tokendata, item.rank)
+# print('\n## Edges')
+# # merge witness-specific edge lists into single list
+# for edge in sorted(edges):
+#     print(edge[0].norm, edge[0].tokendata, '→', edge[1].norm, edge[1].tokendata)
+# print('\n## Edge target → sources (norm, tokendata, rank)')
+# for key, value in edges:
+#     print(key, key.tokendata, key.rank, '→', value, value.tokendata, key.rank)
+# print('\n## Nodes by rank')
+# for key, value in nodesByRank.items():
+#     print(key, '→' ,value)
+# print('\n## At last! Alignment table')
+# print(table)
