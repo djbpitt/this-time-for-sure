@@ -1,17 +1,52 @@
 import org.junit.jupiter.api.Test;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URISyntaxException;
 import java.util.*;
 
 public class DarwinTest {
 
+    public String readTextFile(String filename) throws IOException {
+        // Open the file
+        FileInputStream fstream = new FileInputStream(filename);
+        BufferedReader br = new BufferedReader(new InputStreamReader(fstream));
+
+        StringBuilder result = new StringBuilder();
+        String strLine;
+
+        //Read File Line By Line
+        while ((strLine = br.readLine()) != null)   {
+            // Print the content on the console
+            //System.out.println (strLine);
+            result.append(strLine);
+        }
+
+        //Close the input stream
+        br.close();
+        return result.toString();
+    }
+
     @Test
-    public void testRepetition() {
-        String darwin1859_1 = "WHEN we look to the individuals of the same variety or sub-variety of our older cultivated plants and animals, one of";
-        String darwin1860_1 = "WHEN we look to the individuals of the same variety or sub-variety of our older cultivated plants and animals, one of";
-        String darwin1861_1 = "WHEN we look to the individuals of the same variety or sub-variety of our older cultivated plants and animals, one of";
-        String darwin1866_1 = "Causes of Variability. WHEN we look to the individuals of the same variety or sub-variety of our older cultivated plants and animals, one of";
-        String darwin1869_1 = "Causes of Variability. WHEN we compare the individuals of the same variety or sub-variety of our older cultivated plants and animals, one of";
-        String darwin1872_1 = "Causes of Variability. WHEN we compare the individuals of the same variety or sub-variety of our older cultivated plants and animals, one of";
+    public void testRepetition() throws URISyntaxException, IOException {
+//        String darwin1859_1 = "WHEN we look to the individuals of the same variety or sub-variety of our older cultivated plants and animals, one of";
+//        String darwin1860_1 = "WHEN we look to the individuals of the same variety or sub-variety of our older cultivated plants and animals, one of";
+//        String darwin1861_1 = "WHEN we look to the individuals of the same variety or sub-variety of our older cultivated plants and animals, one of";
+//        String darwin1866_1 = "Causes of Variability. WHEN we look to the individuals of the same variety or sub-variety of our older cultivated plants and animals, one of";
+//        String darwin1869_1 = "Causes of Variability. WHEN we compare the individuals of the same variety or sub-variety of our older cultivated plants and animals, one of";
+//        String darwin1872_1 = "Causes of Variability. WHEN we compare the individuals of the same variety or sub-variety of our older cultivated plants and animals, one of";
+
+        System.out.println("Working Directory = " +
+                System.getProperty("user.dir"));
+
+        // read darwin 1859 file
+        String darwin1859_1 = readTextFile("../darwin/chapter_1_paragraph_1/darwin1859_par1.txt");
+        String darwin1866_1 = readTextFile("../darwin/chapter_1_paragraph_1/darwin1866_par1.txt");
+
+
+
 
 
         // We need to tokenize the witnesses
