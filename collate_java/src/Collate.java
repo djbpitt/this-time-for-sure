@@ -1,5 +1,9 @@
 
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -10,6 +14,79 @@ import java.util.stream.Collectors;
  * Based on research done in the skipgram branch of CollateX.
  */
 class Collate {
+
+
+    public static String readTextFile(String filename) throws IOException {
+        // Open the file
+        FileInputStream fstream = new FileInputStream(filename);
+        BufferedReader br = new BufferedReader(new InputStreamReader(fstream));
+
+        StringBuilder result = new StringBuilder();
+        String strLine;
+
+        //Read File Line By Line
+        while ((strLine = br.readLine()) != null)   {
+            // Print the content on the console
+            //System.out.println (strLine);
+            result.append(strLine);
+        }
+
+        //Close the input stream
+        br.close();
+        return result.toString();
+    }
+
+
+    public static void collate(Map<String, List<String>> witnessData) {
+        Map<List<String>, List<Collate.Skipgram>> commonSequenceTable = Collate.createCommonSequenceTable(witnessData);
+
+        // We create a function that calculates the uniqueness of each key in the common sequence table
+        Map<List<String>, Collate.AnalyticResult> uniquenessFactor = Collate.analyse(commonSequenceTable);
+
+
+        // the reasoning during the creation of the priority list is too simple
+        // we first need to gather more info to be able to able to make better decisions.
+        List<List<String>> commonSequencePriorityList = Collate.createCommonSequencePriorityList(commonSequenceTable);
+
+        // Diagnostic output
+        for (List<String> key : commonSequencePriorityList) {
+            System.out.println(String.join(" ", key) + " " + uniquenessFactor.get(key)+" "+commonSequenceTable.get(key));
+        }
+
+        // we create the topological ordered list
+        // by selecting one skip bigram from the common sequence priority list
+        List<VariantGraphCreator.Node> topologicalList = VariantGraphCreator.initList();
+
+
+        for (List<String> normalizedBigram : commonSequencePriorityList) {
+            // get the actual bigrams from the CST
+            List<Collate.Skipgram> skipgrams = commonSequenceTable.get(normalizedBigram);
+
+            for(Collate.Skipgram skipgram : skipgrams) {
+                selectSkipgram(skipgram, witnessData, topologicalList);
+            }
+        }
+
+        System.out.println(topologicalList);
+
+
+
+    }
+
+    private static void selectSkipgram(Collate.Skipgram skipgram, Map<String, List<String>> witnessData, List<VariantGraphCreator.Node> topologicalList) {
+        // we must look for the location where to insert the vertex
+        // we have to get the tokens out of the bigram
+        // this method has to be called twice. Once for each token in the skipgram
+        String witnessId = skipgram.witnessId;
+        int position = skipgram.first;
+        String value = witnessData.get(witnessId).get(position);
+        VariantGraphCreator.insertTokenInVariantGraph(topologicalList, witnessId, position, value);
+
+        position = skipgram.second;
+        value = witnessData.get(witnessId).get(position);
+        VariantGraphCreator.insertTokenInVariantGraph(topologicalList, witnessId, position, value);
+    }
+
 
 
 //    Sample data
