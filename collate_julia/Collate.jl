@@ -45,3 +45,13 @@ for item in csList
     println(item, " ==> ", csTable[item])
 end
 
+
+mutable struct Node
+    normalized::String
+end
+
+###
+# Build topological ordered list
+###
+toList = Vector{Node}()
+append!(toList, [Node("#start"), Node("#end")])
