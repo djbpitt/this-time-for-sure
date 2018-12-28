@@ -18,35 +18,35 @@ witnessData = Dict( "wit1" => ["a", "b", "c", "d", "e"],
 println(typeof(witnessData))
 println(witnessData)
 
-csTable = DefaultDict(Array)
+csTable = DefaultDict{Tuple, Vector{Tuple{String, Int64, Int64}}}(Vector{Tuple})
 
 for (key, value) in witnessData
     println(key)
 #    println(value[1:end])
     for idx in 1:length(value)
-        println("idx1 ", idx)
+        # println("idx1 ", idx)
         for idx2 in idx+1:length(value)
-            println("idx2 ", idx2 )
+            # println("idx2 ", idx2 )
+            push!(csTable[(value[idx], value[idx2])], (key, idx, idx2))
         end
     end
 end
 
-# # Sample data
-# witnessData = {'wit1': ['a', 'b', 'c', 'd', 'e'],
-#                'wit2': ['a', 'e', 'c', 'd'],
-#                'wit3': ['a', 'd', 'b']}
-#
-# witOrders = list(permutations(['wit1', 'wit2', 'wit3']))
-# for witOrder in witOrders:
-#
-#     ###
-#     # Construct common sequence table (csTable) of all witnesses as dict
-#     ###
-#     # key is skip-bigram
-#     # value is list of (siglum, pos1, pos2) tuple, with positions of skipgram characters
-#     csTable = collections.defaultdict(list)
-#     for key in witOrder:
-#         value = witnessData[key]
-#         for first in range(len(value)):
-#             for second in range(first + 1, len(value)):
-#                 csTable[(value[first], value[second])].append((key, first, second))
+
+    ###
+    # Sort table into common sequence list (csList)
+    ###
+    #   order by 1) number of witnesses (numerical high to low) and 2) sequence (alphabetic low to high)
+    println(typeof(collect(keys(csTable))))
+
+#     csList = SortedDict(csTable)
+
+   csList = sort(collect(keys(csTable)))
+
+    # , lt= (x,y) -> y > x DIT IS HETZELFDE ALS DE DEFAULT!
+    #, by=k -> (-length(k[2], k[1]))
+
+for item in csList
+    println(item,":",csTable[item])
+end
+
