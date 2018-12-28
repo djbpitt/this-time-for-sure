@@ -18,7 +18,7 @@ witnessData = Dict( "wit1" => ["a", "b", "c", "d", "e"],
 println(typeof(witnessData))
 println(witnessData)
 
-csTable = DefaultDict(Vector)
+csTable = DefaultDict{Tuple, Vector{Tuple{String, Int64, Int64}}}(Vector)
 
 for (key, value) in witnessData
     println(key)
@@ -37,22 +37,11 @@ end
     # Sort table into common sequence list (csList)
     ###
     #   order by 1) number of witnesses (numerical high to low) and 2) sequence (alphabetic low to high)
-    println(typeof(collect((csTable))))
-
-#     csList = SortedDict(csTable)
-
     # This works but seems more complicated than needed.
-    csList = sort([(k, v) for (k, v) in csTable], by = x -> (-length(x[2]), x[1]))
+    csList = sort(collect(keys(csTable)), by = key -> (-length(csTable[key]), key))
 
-   println(csList)
-
-
-   # sort(collect((csTable)), lt = (x,y) -> length(y[1]) > length(x[1]))
-
-    # , lt= (x,y) -> y > x DIT IS HETZELFDE ALS DE DEFAULT!
-    #, by=k -> (-length(k[2], k[1]))
 
 for item in csList
-    println(item)
+    println(item, " ==> ", csTable[item])
 end
 
