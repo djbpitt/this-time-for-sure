@@ -5,6 +5,9 @@ Collate:
 - Date: 2018-12-28
 =#
 
+
+using DataStructures
+
 # create witness data
 # TODO: Make ordered dict!
 
@@ -15,9 +18,18 @@ witnessData = Dict( "wit1" => ["a", "b", "c", "d", "e"],
 println(typeof(witnessData))
 println(witnessData)
 
+csTable = DefaultDict(Array)
 
-
-
+for (key, value) in witnessData
+    println(key)
+#    println(value[1:end])
+    for idx in 1:length(value)
+        println("idx1 ", idx)
+        for idx2 in idx+1:length(value)
+            println("idx2 ", idx2 )
+        end
+    end
+end
 
 # # Sample data
 # witnessData = {'wit1': ['a', 'b', 'c', 'd', 'e'],
