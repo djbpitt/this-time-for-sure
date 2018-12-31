@@ -8,6 +8,54 @@ Collate:
 
 using DataStructures
 
+mutable struct Node
+    normalized::String
+end
+
+struct Token
+    witnessId::String
+    normalized::String
+    position::Int32
+end
+
+
+
+function find_lower_and_higher_bound_topological_list(token)
+    println("Called!")
+    # we are going over the topological list
+    # from left to right
+    # we filter out all the nodes that are not part of the witness of the token
+    # in that case we move to the right
+    # of course we can also skip the start and the end nodes
+    # so initialy we set the lower and the upper bound to the start and end nodes.
+    # so that is one for lower
+    # and 2 for upper (length of topological list)
+    # then we loop from lower +1 to upper -1 to see whether we can find a position for the token to place in.
+    lower = 1
+    upper = length(toList)
+    for position in lower+1:upper-1
+        println(position)
+        #TODO: zoek
+        end
+    return lower, upper
+end
+
+function insert_token_in_topological_list(token, toList)
+        lower, upper = find_lower_and_higher_bound_topological_list(token)
+        # there are multiple possible situations
+        # lower and upper differ by one a token needs to be inserted on the place of the upper
+        if upper - lower == 1
+            # convert token to node
+            # TODO: Question is there an explicit way to implement conversation in Julia?
+            node = Node(token.normalized)
+            # TODO: I should not append at the end, but at the place of the upper bound
+            # Maybe not use an array but an unrolled linked list?
+            push!(toList, node)
+        else
+            println("NOT IMPLEMENTED YET!")
+        end
+end
+
 # create witness data
 # TODO: Make ordered dict!
 
@@ -46,16 +94,6 @@ end
 # end
 
 
-mutable struct Node
-    normalized::String
-end
-
-struct Token
-    witnessId::String
-    normalized::String
-    position::Int32
-end
-
 ###
 # Build topological ordered list
 ###
@@ -78,8 +116,12 @@ for normalized_skipgram in csList
 #            println("Token: ", witnessIdentifier, ", ", normalized, ", ", offset)
             token = Token(witnessIdentifier, normalized, offset)
             println(token)
+            insert_token_in_topological_list(token, toList)
         end
     end
     # TODO: for now to control the flow of the output
     break
 end
+
+println(toList)
+
