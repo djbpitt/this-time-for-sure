@@ -41,13 +41,19 @@ end
     csList = sort(collect(keys(csTable)), by = key -> (-length(csTable[key]), key))
 
 
-for item in csList
-    println(item, " ==> ", csTable[item])
-end
+# for item in csList
+#     println(item, " ==> ", csTable[item])
+# end
 
 
 mutable struct Node
     normalized::String
+end
+
+struct Token
+    witnessId::String
+    normalized::String
+    position::Int32
 end
 
 ###
@@ -55,3 +61,25 @@ end
 ###
 toList = Vector{Node}()
 append!(toList, [Node("#start"), Node("#end")])
+
+for normalized_skipgram in csList
+    skipgrams = csTable[normalized_skipgram]
+    for skipgram in skipgrams
+        # each skipgram has two tokens
+        # For each token we need the witness id (in the skipgram)
+        # the normalized form (in the normalized_skipgram as a tuple)
+        # each token has a location within the witness
+        # both tokens are from the same witness
+        # TODO: in the future the non-normalized representation would also need to be fetched from the witness data
+        witnessIdentifier = skipgram[1]
+        for token_number in 1:2
+            normalized = normalized_skipgram[token_number]
+            offset = skipgram[token_number+1]
+#            println("Token: ", witnessIdentifier, ", ", normalized, ", ", offset)
+            token = Token(witnessIdentifier, normalized, offset)
+            println(token)
+        end
+    end
+    # TODO: for now to control the flow of the output
+    break
+end
