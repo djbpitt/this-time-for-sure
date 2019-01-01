@@ -48,9 +48,8 @@ function insert_token_in_topological_list(token, toList)
             # convert token to node
             # TODO: Question is there an explicit way to implement conversation in Julia?
             node = Node(token.normalized)
-            # TODO: I should not append at the end, but at the place of the upper bound
-            # Maybe not use an array but an unrolled linked list?
-            push!(toList, node)
+            # NOTE: possible performamnce; Maybe not use an array but an unrolled linked list?
+            insert!(toList, upper, node)
         else
             println("NOT IMPLEMENTED YET!")
         end
