@@ -10,6 +10,7 @@ using DataStructures
 
 mutable struct Node
     normalized::String
+    positions::Dict{String, Int64}
 end
 
 struct Token
@@ -33,26 +34,59 @@ function find_lower_and_higher_bound_topological_list(token)
     # then we loop from lower +1 to upper -1 to see whether we can find a position for the token to place in.
     lower = 1
     upper = length(toList)
+    token_position = token.position
     for position in lower+1:upper-1
         println(position)
         #TODO: zoek
+        # if the current position is higher than the one we are looking for
+        # position is not really the right word here;
+        # because we go through the list of nodes of the topological ordered list
+        #
+        current_node = toList[position]
+        # het kan zo zijn dat een node niet informatie voor een bepaalde witness bevat
+        # zo niet dan gaan we door naar rechts.
+        if !(token.witnessId in keys(current_node.positions))
+            continue
         end
+        position_for_witness_in_this_node = current_node.positions[token.witnessId]
+        if position_for_witness_in_this_node == token_position
+             # we found the one
+             lower = idx
+             upper = idx
+             break
+        elseif position_for_witness_in_this_node < token_position
+            lower = idx
+        elseif position_for_witness_in_this_node > token_position
+            upper = idx
+            break
+        end
+    end
     return lower, upper
 end
 
 function insert_token_in_topological_list(token, toList)
-        lower, upper = find_lower_and_higher_bound_topological_list(token)
-        # there are multiple possible situations
-        # lower and upper differ by one a token needs to be inserted on the place of the upper
-        if upper - lower == 1
-            # convert token to node
-            # TODO: Question is there an explicit way to implement conversation in Julia?
-            node = Node(token.normalized)
-            # NOTE: possible performamnce; Maybe not use an array but an unrolled linked list?
-            insert!(toList, upper, node)
-        else
-            println("NOT IMPLEMENTED YET!")
-        end
+    lower, upper = find_lower_and_higher_bound_topological_list(token)
+
+    # there are multiple possible situations
+    # lower and upper differ by one a token needs to be inserted on the place of the upper
+    if upper - lower == 1
+        # convert token to node
+        # TODO: Question is there an explicit way to implement conversation in Julia?
+        node = Node(token.normalized, Dict())
+        # TODO: dict should not be empty!
+        # NOTE: possible performance; Maybe not use an array but an unrolled linked list?
+        insert!(toList, upper, node)
+        return
+    end
+
+    # het kan zijn dat we nu moeten zoeken naar dezelfde normalised form.
+    # als ze exact gelijk zijn aan elkaar dan is de token al gevonden en doet de insert dus niets
+    if upper - lower == 0
+        println("Already in the collection!")
+        return
+    end
+
+    println("NOT IMPLEMENTED YET!")
 end
 
 # create witness data
@@ -97,7 +131,8 @@ end
 # Build topological ordered list
 ###
 toList = Vector{Node}()
-append!(toList, [Node("#start"), Node("#end")])
+# TODO: how to default the second parameter in the constructor of Node to empty dictionary?
+append!(toList, [Node("#start", Dict{String, Int64}()), Node("#end", Dict{String, Int64}())])
 
 for normalized_skipgram in csList
     skipgrams = csTable[normalized_skipgram]
