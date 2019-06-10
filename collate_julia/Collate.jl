@@ -20,6 +20,35 @@ struct Token
 end
 
 
+# create witness data
+# TODO: Make ordered dict!
+
+witnessData = Dict( "wit1" => ["a", "b", "c", "d", "e"],
+                    "wit2" => ["a", "e", "c","d"],
+                    "wit3" => ["a", "d", "b"])
+
+println(typeof(witnessData))
+println(witnessData)
+
+# create token array
+token_array = []
+append!(token_array, witnessData["wit1"])
+append!(token_array, "#")
+append!(token_array, witnessData["wit2"])
+append!(token_array, "#")
+append!(token_array, witnessData["wit3"])
+
+println(token_array)
+
+
+
+
+
+
+
+
+
+
 
 function find_lower_and_higher_bound_topological_list(token)
     println("Called!")
@@ -89,29 +118,31 @@ function insert_token_in_topological_list(token, toList)
     println("NOT IMPLEMENTED YET!")
 end
 
-# create witness data
-# TODO: Make ordered dict!
 
-witnessData = Dict( "wit1" => ["a", "b", "c", "d", "e"],
-                    "wit2" => ["a", "e", "c","d"],
-                    "wit3" => ["a", "d", "b"])
 
-println(typeof(witnessData))
-println(witnessData)
 
-csTable = DefaultDict{Tuple, Vector{Tuple{String, Int64, Int64}}}(Vector)
 
-for (key, value) in witnessData
-    println(key)
-#    println(value[1:end])
-    for idx in 1:length(value)
-        # println("idx1 ", idx)
-        for idx2 in idx+1:length(value)
-            # println("idx2 ", idx2 )
-            push!(csTable[(value[idx], value[idx2])], (key, idx, idx2))
+
+
+
+
+
+
+# Code written previously
+function previous_code()
+    csTable = DefaultDict{Tuple, Vector{Tuple{String, Int64, Int64}}}(Vector)
+
+    for (key, value) in witnessData
+        println(key)
+    #    println(value[1:end])
+        for idx in 1:length(value)
+            # println("idx1 ", idx)
+            for idx2 in idx+1:length(value)
+                # println("idx2 ", idx2 )
+                push!(csTable[(value[idx], value[idx2])], (key, idx, idx2))
+            end
         end
     end
-end
 
 
     ###
@@ -127,35 +158,35 @@ end
 # end
 
 
-###
-# Build topological ordered list
-###
-toList = Vector{Node}()
-# TODO: how to default the second parameter in the constructor of Node to empty dictionary?
-append!(toList, [Node("#start", Dict{String, Int64}()), Node("#end", Dict{String, Int64}())])
+    ###
+    # Build topological ordered list
+    ###
+    toList = Vector{Node}()
+    # TODO: how to default the second parameter in the constructor of Node to empty dictionary?
+    append!(toList, [Node("#start", Dict{String, Int64}()), Node("#end", Dict{String, Int64}())])
 
-for normalized_skipgram in csList
-    skipgrams = csTable[normalized_skipgram]
-    for skipgram in skipgrams
-        # each skipgram has two tokens
-        # For each token we need the witness id (in the skipgram)
-        # the normalized form (in the normalized_skipgram as a tuple)
-        # each token has a location within the witness
-        # both tokens are from the same witness
-        # TODO: in the future the non-normalized representation would also need to be fetched from the witness data
-        witnessIdentifier = skipgram[1]
-        for token_number in 1:2
-            normalized = normalized_skipgram[token_number]
-            offset = skipgram[token_number+1]
-#            println("Token: ", witnessIdentifier, ", ", normalized, ", ", offset)
-            token = Token(witnessIdentifier, normalized, offset)
-            println(token)
-            insert_token_in_topological_list(token, toList)
+    for normalized_skipgram in csList
+        skipgrams = csTable[normalized_skipgram]
+        for skipgram in skipgrams
+            # each skipgram has two tokens
+            # For each token we need the witness id (in the skipgram)
+            # the normalized form (in the normalized_skipgram as a tuple)
+            # each token has a location within the witness
+            # both tokens are from the same witness
+            # TODO: in the future the non-normalized representation would also need to be fetched from the witness data
+            witnessIdentifier = skipgram[1]
+            for token_number in 1:2
+                normalized = normalized_skipgram[token_number]
+                offset = skipgram[token_number+1]
+    #            println("Token: ", witnessIdentifier, ", ", normalized, ", ", offset)
+                token = Token(witnessIdentifier, normalized, offset)
+                println(token)
+                insert_token_in_topological_list(token, toList)
+            end
         end
+        # TODO: for now to control the flow of the output
+        break
     end
-    # TODO: for now to control the flow of the output
-    break
+
+    println(toList)
 end
-
-println(toList)
-
