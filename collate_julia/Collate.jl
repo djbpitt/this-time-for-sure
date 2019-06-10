@@ -58,8 +58,18 @@ println(suffix_array)
 #     println(a)
 # end
 
-println(sort(suffix_array, lt=less_than))
+sort!(suffix_array, lt=less_than)
+println(suffix_array)
 
+# show the suffix array
+for token_pointer in suffix_array
+    sub_token_array = token_array[token_pointer:end]
+    a = findfirst(x -> x == "#", sub_token_array)
+    if a != nothing
+        sub_token_array = sub_token_array[1:a]
+    end
+    println(sub_token_array)
+end
 
 
 
