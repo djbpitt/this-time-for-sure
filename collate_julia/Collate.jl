@@ -19,6 +19,14 @@ struct Token
     position::Int32
 end
 
+function less_than(i::Int64, j::Int64)
+    if (token_array[i] < token_array[j])
+        return true
+    else
+        return false
+    end
+end
+
 
 # create witness data
 # TODO: Make ordered dict!
@@ -33,14 +41,24 @@ println(witnessData)
 # create token array
 token_array = []
 append!(token_array, witnessData["wit1"])
-append!(token_array, "#")
+push!(token_array, "#")
 append!(token_array, witnessData["wit2"])
-append!(token_array, "#")
+push!(token_array, "#")
 append!(token_array, witnessData["wit3"])
 
 println(token_array)
 
+# create suffix array
+# the suffix array has the same length as the token array
+# for now we fill it with integers counting upwards
+suffix_array = collect(1:length(token_array))
+println(suffix_array)
 
+# for a in suffix_array
+#     println(a)
+# end
+
+println(sort(suffix_array, lt=less_than))
 
 
 
