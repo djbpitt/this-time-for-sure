@@ -179,7 +179,7 @@ for witOrder in witOrders:
     print('\n## bitArrays (equal to length of witness)')
     pp.pprint((bitArrays))
     print('\n## toList (topologically ordered list')
-    pp.pprint((toList))
+    pp.pprint(list((item for item in toList)))
     print('\n## Nodes in topological order (norm, tokendata, rank): ')
     for item in toList:
         print(item, item.tokendata, item.rank)
