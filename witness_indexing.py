@@ -11,11 +11,10 @@
 #
 #
 
-
-# this method creates both the token array and the witness ranges dictionary
 import functools
 
 
+# this method creates both the token array and the witness ranges dictionary
 def _prepare_token_array(_witness_data):
     counter = 0
     _token_array = []
@@ -33,6 +32,7 @@ def _prepare_token_array(_witness_data):
     return _token_array, _witness_ranges
 
 
+# Custom comparator
 def _cmp_tokens_in_token_array(index_i, index_j):
     # print("Asked for:", index_i, index_j)
     token_a = token_array[index_i]
@@ -57,21 +57,8 @@ def _cmp_tokens_in_token_array(index_i, index_j):
 
 def _create_suffix_array(_token_array):
     _suffix_array = [item for item in range(0, len(_token_array))]
-    # I need a custom comparator
     _suffix_array = sorted(_suffix_array, key=functools.cmp_to_key(_cmp_tokens_in_token_array))
     print(_suffix_array)
-
-
-# create suffix array
-# the suffix array has the same length as the token array
-# for now we fill it with integers counting upwards
-
-# for a in suffix_array
-#     println(a)
-# end
-
-# sort!(suffix_array, lt=less_than)
-# println(suffix_array)
 
 # We take a simple example
 # Sample data
