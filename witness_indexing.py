@@ -13,12 +13,12 @@
 
 
 # this method creates both the token array and the witness ranges dictionary
-def _prepare_token_array(witness_data):
+def _prepare_token_array(_witness_data):
     counter = 0
     _token_array = []
     _witness_ranges = {}
-    for idx, sigil in enumerate(witness_data):
-        witness_tokens = witness_data[sigil]
+    for idx, sigil in enumerate(_witness_data):
+        witness_tokens = _witness_data[sigil]
         # print("witness.tokens", witness)
         witness_range = (counter, counter + len(witness_tokens))
         # the extra one is for the marker token
@@ -33,6 +33,22 @@ def _prepare_token_array(witness_data):
     return _token_array, _witness_ranges
 
 
+def _create_suffix_array(_token_array):
+    _suffix_array = [item for item in range(1, len(_token_array))]
+    print(_suffix_array)
+
+
+# create suffix array
+# the suffix array has the same length as the token array
+# for now we fill it with integers counting upwards
+
+# for a in suffix_array
+#     println(a)
+# end
+
+# sort!(suffix_array, lt=less_than)
+# println(suffix_array)
+
 # We take a simple example
 # Sample data
 witness_data = {'wit1': ['a', 'b', 'c', 'd', 'e'],
@@ -42,4 +58,5 @@ witness_data = {'wit1': ['a', 'b', 'c', 'd', 'e'],
 token_array, witness_ranges = _prepare_token_array(witness_data)
 print(token_array)
 print(witness_ranges)
+_create_suffix_array(token_array)
 
