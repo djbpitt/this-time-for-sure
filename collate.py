@@ -1,6 +1,8 @@
 import collections
 from itertools import permutations
 from bitarray import bitarray
+import pprint
+pp = pprint.PrettyPrinter(indent=2)
 from prettytable import PrettyTable # not part of anaconda distribution; install with pip
 
 
@@ -40,13 +42,14 @@ for witOrder in witOrders:
     # Construct common sequence table (csTable) of all witnesses as dict
     ###
     # key is skip-bigram
-    # value is list of (siglum, pos1, pos2) tuple, with positions of skipgram characters
+    # value is list of (siglum, pos0, pos1) tuple, with positions of skipgram characters
     csTable = collections.defaultdict(list)
     for key in witOrder:
         value = witnessData[key]
         for first in range(len(value)):
             for second in range(first + 1, len(value)):
                 csTable[(value[first], value[second])].append((key, first, second))
+
     ###
     # Sort table into common sequence list (csList)
     ###
@@ -57,25 +60,26 @@ for witOrder in witOrders:
         ba.setall(0)
 
     ###
-    # Build topologically ordered list (toList)
+    # Build topologically ordered list of nodes (toList)
     ###
     toList = []
     toList.extend([Node('#start'), Node('#end')])
-    for skipgram in csList:
-        locations = csTable[skipgram]  # list of tuples of (siglum, location1, location2) for skipgram
-        norms = list(skipgram)  # two tokens
-        for skipgramPos in range(len(norms)):  # loop over head and tail by position ([1, 2])
-            norm = norms[skipgramPos]  # normalized value of token
+    for skipgram in csList: # skipgram is a tuple of skipgram items
+        locations = csTable[skipgram]  # list of three-item tuples of (siglum, location0, location1)
+        # TODO: Is the following conversion necessary? Why not just loop over the tuple members?
+        norms = list(skipgram)  # convert two-item tuple to two-item list
+        for skipgramPos in range(len(norms)):  # loop over head and tail by position ([0, 1])
+            norm = norms[skipgramPos]  # get normalized value of each token in skipgram by position
             for location in locations:  # for each token, get witness and offset within witness
                 siglum = location[0]  # witness identifier
                 offset = location[skipgramPos + 1]  # offset of token within witness
-                if bitArrays[siglum][offset] == 1:
+                if bitArrays[siglum][offset] == 1: # already set, so break for this location
                     # print('skipping: ', norm, ' from ', skipgram, ' at ', location)
                     break
                 floor = 0
                 ceiling = len(toList) - 1
                 modifyMe = None  # existing toList entry to be modified; if None, create a new one
-                for dictPos in range(len(toList)):
+                for dictPos in range(len(toList)): # determine floor and ceiling
                     currentDict = toList[dictPos].tokendata
                     if siglum not in currentDict.keys():  # dictionary isn't relevant; check the next item in toList
                         pass
@@ -92,7 +96,7 @@ for witOrder in witOrders:
                     if toList[pos].norm == norm:
                         modifyMe = toList[pos]
                         break
-                # if there is a dictionary to modify, do it; otherwise insert a new dictionary
+                # if there is a dictionary to modify, do it; otherwise insert a new dictionary at the ceiling
                 if modifyMe is None:
                     new_token = Node(norm)
                     new_token.add_location(siglum, offset)
@@ -163,23 +167,31 @@ for witOrder in witOrders:
         table.add_column(None, columnData)
     ###
     # Diagnostic output
-    ###
-    # print('---\n## witOrder =', witOrder)
-    # print('\n## Input')
-    # for item in witnessData.items():
-    #     print(item)
-    # print('\n## Nodes in topological order (norm, tokendata, rank): ')
-    # for item in toList:
-    #     print(item, item.tokendata, item.rank)
-    # print('\n## Edges')
-    # # merge witness-specific edge lists into single list
-    # for edge in sorted(edges):
-    #     print(edge[0].norm, edge[0].tokendata, '→', edge[1].norm, edge[1].tokendata)
-    # print('\n## Edge target → sources (norm, tokendata, rank)')
-    # for key, value in edges:
-    #     print(key, key.tokendata, key.rank, '→', value, value.tokendata, key.rank)
-    # print('\n## Nodes by rank')
-    # for key, value in nodesByRank.items():
-    #     print(key, '→' ,value)
-    # print('\n## At last! Alignment table')
+    ##
+    print('---\n## witOrder =', witOrder)
+    print('\n## Input')
+    for item in witnessData.items():
+        print(item)
+    print('\n## csTable')
+    pp.pprint(csTable)
+    print('\n## csList (sorted by number of occurrences and then alphabetically)')
+    pp.pprint(csList)
+    print('\n## bitArrays (equal to length of witness)')
+    pp.pprint((bitArrays))
+    print('\n## toList (topologically ordered list')
+    pp.pprint((toList))
+    print('\n## Nodes in topological order (norm, tokendata, rank): ')
+    for item in toList:
+        print(item, item.tokendata, item.rank)
+    print('\n## Edges')
+    # merge witness-specific edge lists into single list
+    for edge in sorted(edges):
+        print(edge[0].norm, edge[0].tokendata, '→', edge[1].norm, edge[1].tokendata)
+    print('\n## Edge target → sources (norm, tokendata, rank)')
+    for key, value in edges:
+        print(key, key.tokendata, key.rank, '→', value, value.tokendata, key.rank)
+    print('\n## Nodes by rank')
+    for key, value in nodesByRank.items():
+        print(key, '→' ,value)
+    print('\n## At last! Alignment table')
     print(table)
