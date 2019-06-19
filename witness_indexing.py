@@ -30,9 +30,6 @@ def _prepare_token_array(_witness_data):
         _token_array.extend(witness_tokens)
         # add marker token
         _token_array.append('$' + str(idx))
-    # # remove last marker
-    # _token_array.pop()
-    # # note at the moment we do not remove the last marker from the witness ranges.
     return _token_array, _witness_ranges
 
 
@@ -42,24 +39,24 @@ def _cmp_tokens_in_token_array(index_i, index_j):
     token_b = token_array[index_j]
     # TODO: this has to be in a loop, rather then recursive
     if token_a == token_b:
-        print(index_i, " ", token_a, " and ", index_j, " are equal; checking next")
+        # print(index_i, " ", token_a, " and ", index_j, " are equal; checking next")
         # check exit condition
         if index_i < len(token_array)-1 and index_j < len(token_array)-1:
             # compare the next token.
             return _cmp_tokens_in_token_array(index_i+1, index_j+1)
-        print("We are close to running out of bounds")
+        # print("We are close to running out of bounds")
         return 0
     else:
         if token_a < token_b:
-            print(token_a,  " is less than ", token_b, " ", index_i)
+            # print(token_a,  " is less than ", token_b, " ", index_i)
             return -1
         else:
-            print(token_a,  " is more than ", token_b, " ", index_i)
+            # print(token_a,  " is more than ", token_b, " ", index_i)
             return 1
 
 
 def _create_suffix_array(_token_array):
-    _suffix_array = [item for item in range(1, len(_token_array))]
+    _suffix_array = [item for item in range(0, len(_token_array))]
     # I need a custom comparator
     _suffix_array = sorted(_suffix_array, key=functools.cmp_to_key(_cmp_tokens_in_token_array))
     print(_suffix_array)
