@@ -32,9 +32,10 @@ def _prepare_token_array(_witness_data):
     # note at the moment we do not remove the last marker from the witness ranges.
     return _token_array, _witness_ranges
 
-
 def _create_suffix_array(_token_array):
     _suffix_array = [item for item in range(1, len(_token_array))]
+    # I need a custom comparator
+    _suffix_array = sorted(_suffix_array, key=lambda i: _token_array[i])
     print(_suffix_array)
 
 
