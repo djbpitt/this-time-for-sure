@@ -66,10 +66,8 @@ for witOrder in witOrders:
     toList.extend([Node('#start'), Node('#end')])
     for skipgram in csList: # skipgram is a tuple of skipgram items
         locations = csTable[skipgram]  # list of three-item tuples of (siglum, location0, location1)
-        # TODO: Is the following conversion necessary? Why not just loop over the tuple members?
-        norms = list(skipgram)  # convert two-item tuple to two-item list
-        for skipgramPos in range(len(norms)):  # loop over head and tail by position ([0, 1])
-            norm = norms[skipgramPos]  # get normalized value of each token in skipgram by position
+        for skipgramPos in range(len(skipgram)):  # loop over head and tail by position ([0, 1])
+            norm = skipgram[skipgramPos]  # get normalized value of each token in skipgram by position
             for location in locations:  # for each token, get witness and offset within witness
                 siglum = location[0]  # witness identifier
                 offset = location[skipgramPos + 1]  # offset of token within witness
