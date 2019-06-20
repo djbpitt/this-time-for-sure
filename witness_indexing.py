@@ -60,6 +60,15 @@ def _create_suffix_array(_token_array):
     return _suffix_array
 
 
+# show the suffix array
+def _show_suffix_array(_suffix_array):
+    for token_pointer in _suffix_array:
+        sub_token_array = token_array[token_pointer:]
+        a = next((idx for idx, x in enumerate(sub_token_array) if x[0] == "$"), 10)
+        sub_token_array = sub_token_array[0:a]
+        print(sub_token_array)
+
+
 # We take a simple example
 # Sample data
 witness_data = {'wit1': ['a', 'b', 'c', 'd', 'e'],
@@ -71,4 +80,6 @@ print(token_array)
 print(witness_ranges)
 suffix_array = _create_suffix_array(token_array)
 print(suffix_array)
+_show_suffix_array(suffix_array)
+
 
