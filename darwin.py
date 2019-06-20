@@ -1,12 +1,15 @@
 import collections
+from bitarray import bitarray
+import pprint
+pp = pprint.PrettyPrinter(indent=2)
+from prettytable import PrettyTable # not in anaconda
+
+import operator
+import itertools
 import glob
 import os
 import re
-from prettytable import PrettyTable
-import operator
-
-from bitarray import bitarray
-
+from tqdm import tqdm
 
 class Node(object):
     def __init__(self, norm):
@@ -58,7 +61,8 @@ witnessData = {}
 for filename in glob.glob(os.path.join('darwin/chapter_1', '*.txt')):
     siglum = yearRegex.search(filename).group(1)
     with open(filename, 'r') as f:
-        witnessData[siglum] = f.read().split()[:150]  # slice to limit word count
+        # witnessData[siglum] = f.read().split()[:150]  # slice to limit word count
+        witnessData[siglum] = f.read().split()  # all words
 
 # Sample data 2: transposition, no repetition
 # witnessData = {'wit1': ['a', 'b', 'c', 'd', 'e'],
@@ -68,23 +72,10 @@ for filename in glob.glob(os.path.join('darwin/chapter_1', '*.txt')):
 ###
 # Construct common sequence table (csTable) of all witnesses as dict
 ###
-csTable = generate_skipgrams(data=witnessData, skip=1, length=2)
+# key is skip-bigram
+# value is list of (siglum, pos0, pos1) tuple, with positions of skipgram characters
 
-# Diagnostic output
-x = PrettyTable()
-x.field_names = ["First", "Second", "Uniqueness", "Depth", "Frequency"]
-x.align["First"] = "l"
-x.align["Second"] = "l"
-x.align["Uniqueness"] = "r"
-x.align["Depth"] = "r"
-x.align["Frequency"] = "r"
-for key, value in csTable.items():
-    first, second = key
-    frequency = len(value)
-    depth = len({item[0] for item in csTable[key]})
-    uniqueness = "{0:.4f}".format(depth / frequency)
-    x.add_row([first, second, uniqueness, depth, frequency])
-print(x.get_string(sort_key=operator.itemgetter(3, 4), sortby="First"))
+csTable = generate_skipgrams(data=witnessData, skip=1, length=2)
 
 ###
 # Sort table into common sequence list (csList; just bigrams, without witness data)
@@ -96,7 +87,6 @@ csList = [k for k in
                                          # uniqueness (depth/frequency)
                                          k  # alphabetical
                                          ))]
-
 ###
 # bitArrays tracks the tokens we've already placed
 ###
@@ -109,7 +99,7 @@ for ba in bitArrays.values():  # initialize bitarrays to all 0 values
 # ###
 toList = []
 toList.extend([Node('#start'), Node('#end')])
-for skipgram in csList:
+for skipgram in tqdm(csList): # progress bar
     locations = csTable[skipgram]  # list of tuples of (siglum, location1, location2) for skipgram
     norms = list(skipgram)  # two tokens
     for skipgramPos in range(len(norms)):  # loop over head and tail by position ([1, 2])
@@ -217,10 +207,15 @@ for rank, nodes in nodesByRank.items():  # add a column for each rank
 ###
 # Diagnostic output
 ###
-# print('---\n## witOrder =', witOrder)
 # print('\n## Input')
 # for item in witnessData.items():
 #     print(item)
+print('\n## csTable (first 10 items)')
+# pp.pprint(csTable) # full table
+pp.pprint(dict(itertools.islice(csTable.items(), 10))) # first 10 items
+print('\n## csList (sorted by number of occurrences and then alphabetically, first 10 items)')
+# pp.pprint(csList) # full list
+pp.pprint(csList[:10]) # first 10 items
 # print('\n## Nodes in topological order (norm, tokendata, rank): ')
 # for item in toList:
 #     print(item, item.tokendata, item.rank)
@@ -236,3 +231,21 @@ for rank, nodes in nodesByRank.items():  # add a column for each rank
 #     print(key, '→' ,value)
 # print('\n## At last! Alignment table')
 # print(table)
+
+###
+# Diagnostic output
+###
+# x = PrettyTable()
+# x.field_names = ["First", "Second", "Uniqueness", "Depth", "Frequency"]
+# x.align["First"] = "l"
+# x.align["Second"] = "l"
+# x.align["Uniqueness"] = "r"
+# x.align["Depth"] = "r"
+# x.align["Frequency"] = "r"
+# for key, value in csTable.items():
+#     first, second = key
+#     frequency = len(value)
+#     depth = len({item[0] for item in csTable[key]})
+#     uniqueness = "{0:.4f}".format(depth / frequency)
+#     x.add_row([first, second, uniqueness, depth, frequency])
+# print(x.get_string(sort_key=operator.itemgetter(3, 4), sortby="First"))
