@@ -5,6 +5,19 @@ witness_indexing:
 - Date: 2019-06-10
 =#
 
+
+# create token array
+# this is hardcoded
+function create_token_array()
+    token_array = []
+    append!(token_array, witnessData["wit1"])
+    push!(token_array, "#")
+    append!(token_array, witnessData["wit2"])
+    push!(token_array, "#")
+    append!(token_array, witnessData["wit3"])
+    return token_array
+end
+
 # custom comparator to make suffix array based on tokens work
 function less_than(i::Int64, j::Int64)
     if (token_array[i] < token_array[j])
@@ -14,6 +27,20 @@ function less_than(i::Int64, j::Int64)
     end
 end
 
+function create_suffix_array()
+    # create suffix array
+    # the suffix array has the same length as the token array
+    # for now we fill it with integers counting upwards
+    suffix_array = collect(1:length(token_array))
+#    println(suffix_array)
+
+    # for a in suffix_array
+    #     println(a)
+    # end
+
+    sort!(suffix_array, lt=less_than)
+    return suffix_array
+end
 
 
 # create witness data
@@ -26,28 +53,10 @@ witnessData = Dict( "wit1" => ["a", "b", "c", "d", "e"],
 println(typeof(witnessData))
 println(witnessData)
 
-# create token array
-# this is hardcoded
-token_array = []
-append!(token_array, witnessData["wit1"])
-push!(token_array, "#")
-append!(token_array, witnessData["wit2"])
-push!(token_array, "#")
-append!(token_array, witnessData["wit3"])
-
+token_array = create_token_array()
 println(token_array)
 
-# create suffix array
-# the suffix array has the same length as the token array
-# for now we fill it with integers counting upwards
-suffix_array = collect(1:length(token_array))
-println(suffix_array)
-
-# for a in suffix_array
-#     println(a)
-# end
-
-sort!(suffix_array, lt=less_than)
+suffix_array = create_suffix_array()
 println(suffix_array)
 
 # show the suffix array
