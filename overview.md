@@ -57,3 +57,7 @@ Scan from floor toward ceiling, looking for matching `'norm’` valuea:
 \* It’s possible that this token was already there, in which case we’re overwriting it with itself, harmlessly, except for the wasted effort.
 
 **TODO:** There may be more than one dictionary between the floor and ceiling that have the same `'norm'` value that we’re interested in. We are arbitrarily choosing the leftmost. Is this a problem?
+
+____
+
+Stopword list is based on NLTK English stopwords, with partials (e.g., `didn`, `t`) removed.
