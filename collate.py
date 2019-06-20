@@ -124,6 +124,7 @@ for witOrder in witOrders:
                 edgeSets[key].append((edgeSourceByWitness[key], node))
                 edgeSourceByWitness[key] = node
     edges = set(inner for outer in edgeSets.values() for inner in outer)  # tuples of Tokens
+
     ###
     # index from edge target to source for calculating rank
     ###
