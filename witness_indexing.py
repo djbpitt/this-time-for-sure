@@ -94,11 +94,16 @@ def create_skip_bigrams_for_suffix_interval(start, end):
     for suffix_idx in range(start, end+1):
         token_idx = suffix_array[suffix_idx]
         sub_token_array = token_array[token_idx+1:]
+        # pay attention to the fix limit that is included here!
         a = next((idx for idx, x in enumerate(sub_token_array) if x[0] == "$"), 10)
         sub_token_array = sub_token_array[0:a]
         if sub_token_array:
             print(sub_token_array)
 
+        # create skip bigrams
+        start_token_idx = token_idx
+        for end_token_idx in range(start_token_idx+1, start_token_idx+1+a):
+            print(start_token_idx, end_token_idx)
     pass
 
 
