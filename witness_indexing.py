@@ -66,7 +66,8 @@ def _show_suffix_array(_suffix_array):
         sub_token_array = token_array[token_pointer:]
         a = next((idx for idx, x in enumerate(sub_token_array) if x[0] == "$"), 10)
         sub_token_array = sub_token_array[0:a]
-        print(sub_token_array)
+        if sub_token_array:
+            print(sub_token_array)
 
 
 # We take a simple example
@@ -82,4 +83,19 @@ suffix_array = _create_suffix_array(token_array)
 print(suffix_array)
 _show_suffix_array(suffix_array)
 
+# calculate common prefix array
+# walk over the suffix array
+# check whether the first item is the last as the previous item.
+# We create a list initialized to zero?
+# Or do we just create an empty list
+common_prefix_array = []
+previous = None
+for suffix in suffix_array:
+    token = token_array[suffix]
+    if token == previous:
+        common_prefix_array.append(1)
+    else:
+        common_prefix_array.append(0)
+    previous = token
 
+print(common_prefix_array)
