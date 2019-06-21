@@ -111,6 +111,29 @@ def main():
     # now we are going to try build skipgrams
     # to determine which ones we want we need to build a histogram
     # we do that on a token by token basis
+    # First we need to walk over the common prefix array
+
+    prefix_generator = enumerate(common_prefix_array)
+    only_ones_generator = ((idx, prefix) for idx, prefix in prefix_generator if prefix == 1)
+    only_zeroes_generator = ((idx, prefix) for idx, prefix in prefix_generator if prefix == 0)
+
+    idx, common = next(only_ones_generator)
+    print("start is ",idx-1)
+    end, common = next(only_zeroes_generator)
+    print("end is ", end-1)
+
+    # for idx, has_common_prefix in enumerate(common_prefix_array):
+    #     if has_common_prefix == 0:
+    #         continue
+    #
+    #     print("start is ",idx-1)
+    #
+    #     # need to search for the 0 now
+    #     # better use a generator
+    #
+    #     pass
 
 
 main()
+
+
