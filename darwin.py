@@ -64,6 +64,9 @@ for filename in glob.glob(os.path.join('darwin/chapter_1', '*.txt')):
         # witnessData[siglum] = f.read().split()[:150]  # slice to limit word count
         witnessData[siglum] = f.read().split()  # all words
 
+# Stopwords (based on NLTK English list)
+with open('stopwords.txt') as f:
+    stopwords = set(f.read().splitlines())
 # Sample data 2: transposition, no repetition
 # witnessData = {'wit1': ['a', 'b', 'c', 'd', 'e'],
 #                'wit2': ['a', 'e', 'c', 'd'],
@@ -80,13 +83,17 @@ csTable = generate_skipgrams(data=witnessData, skip=1, length=2)
 ###
 # Sort table into common sequence list (csList; just bigrams, without witness data)
 ###
-# sort by depth (high to low), then by uniqueness = depth / frequency, then alphabetically
-csList = [k for k in
-          sorted(csTable, key=lambda k: (-len({entry[0] for entry in csTable[k]}),  # depth (number of witnesses)
-                                         -len({entry[0] for entry in csTable[k]}) / len(csTable[k]),
+# sort by depth (high to low), then by uniqueness (rareness) = depth / frequency, then alphabetically
+csList = [key for key in
+          sorted(csTable, key=lambda k: (k[0] in stopwords and k[1] in stopwords,
+                                         -len({entry[0] for entry in csTable[k]}),  # depth (number of witnesses)
+                                         len({entry[0] for entry in csTable[k]}) / len(csTable[k]),
                                          # uniqueness (depth/frequency)
                                          k  # alphabetical
                                          ))]
+
+for k in csList:
+    print(k, len({entry[0] for entry in csTable[k]}), len({entry[0] for entry in csTable[k]}) / len(csTable[k]))
 ###
 # bitArrays tracks the tokens we've already placed
 ###
@@ -211,8 +218,8 @@ for rank, nodes in nodesByRank.items():  # add a column for each rank
 # print('\n## Input')
 # for item in witnessData.items():
 #     print(item)
-# print('\n## csTable (first 10 items)')
-# pp.pprint(csTable) # full table
+# print('\n## csTable')
+pp.pprint(csTable) # full table
 # pp.pprint(dict(itertools.islice(csTable.items(), 10))) # first 10 items
 print('\n## Formatted iew of csTable')
 x = PrettyTable()
@@ -231,8 +238,8 @@ for key, value in csTable.items():
 print(x.get_string(sort_key=operator.itemgetter(3, 4), sortby="First"))
 
 print('\n## csList (sorted by number of occurrences and then alphabetically, first 10 items)')
-# pp.pprint(csList) # full list
-pp.pprint(csList[:10]) # first 10 items
+pp.pprint(csList) # full list
+# pp.pprint(csList[:10]) # first 10 items
 print('\n## Nodes in topological order (norm, tokendata, rank): ')
 for item in toList:
     print(item, item.tokendata, item.rank)
@@ -248,3 +255,4 @@ for key, value in nodesByRank.items():
     print(key, '→' ,value)
 print('\n## At last! Alignment table')
 print(table)
+print(bitArrays)
