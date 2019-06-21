@@ -88,6 +88,20 @@ def _show_suffix_array(_suffix_array):
             print(sub_token_array)
 
 
+# start and end specify an interval over the suffix array
+# end is inclusive
+def create_skip_bigrams_for_suffix_interval(start, end):
+    for suffix_idx in range(start, end+1):
+        token_idx = suffix_array[suffix_idx]
+        sub_token_array = token_array[token_idx+1:]
+        a = next((idx for idx, x in enumerate(sub_token_array) if x[0] == "$"), 10)
+        sub_token_array = sub_token_array[0:a]
+        if sub_token_array:
+            print(sub_token_array)
+
+    pass
+
+
 def main():
     # We take a simple example
     # Sample data
@@ -117,10 +131,12 @@ def main():
     only_ones_generator = ((idx, prefix) for idx, prefix in prefix_generator if prefix == 1)
     only_zeroes_generator = ((idx, prefix) for idx, prefix in prefix_generator if prefix == 0)
 
-    idx, common = next(only_ones_generator)
-    print("start is ",idx-1)
+    start, common = next(only_ones_generator)
+    print("start is ", start-1)
     end, common = next(only_zeroes_generator)
     print("end is ", end-1)
+
+    create_skip_bigrams_for_suffix_interval(start-1, end-1)
 
     # for idx, has_common_prefix in enumerate(common_prefix_array):
     #     if has_common_prefix == 0:
