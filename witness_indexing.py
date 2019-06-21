@@ -60,6 +60,24 @@ def _create_suffix_array(_token_array):
     return _suffix_array
 
 
+def create_common_prefix_array():
+    global common_prefix_array
+    # calculate common prefix array
+    # walk over the suffix array
+    # check whether the first item is the last as the previous item.
+    # We create a list initialized to zero?
+    # Or do we just create an empty list
+    common_prefix_array = []
+    previous = None
+    for suffix in suffix_array:
+        token = token_array[suffix]
+        if token == previous:
+            common_prefix_array.append(1)
+        else:
+            common_prefix_array.append(0)
+        previous = token
+
+
 # show the suffix array
 def _show_suffix_array(_suffix_array):
     for token_pointer in _suffix_array:
@@ -70,32 +88,29 @@ def _show_suffix_array(_suffix_array):
             print(sub_token_array)
 
 
-# We take a simple example
-# Sample data
-witness_data = {'wit1': ['a', 'b', 'c', 'd', 'e'],
-                'wit2': ['a', 'e', 'c', 'd'],
-                'wit3': ['a', 'd', 'b']}
+def main():
+    # We take a simple example
+    # Sample data
+    witness_data = {'wit1': ['a', 'b', 'c', 'd', 'e'],
+                    'wit2': ['a', 'e', 'c', 'd'],
+                    'wit3': ['a', 'd', 'b']}
 
-token_array, witness_ranges = _prepare_token_array(witness_data)
-print(token_array)
-print(witness_ranges)
-suffix_array = _create_suffix_array(token_array)
-print(suffix_array)
-_show_suffix_array(suffix_array)
+    global token_array
+    token_array, witness_ranges = _prepare_token_array(witness_data)
+    print(token_array)
+    print(witness_ranges)
+    global suffix_array
+    suffix_array = _create_suffix_array(token_array)
+    print(suffix_array)
+    _show_suffix_array(suffix_array)
 
-# calculate common prefix array
-# walk over the suffix array
-# check whether the first item is the last as the previous item.
-# We create a list initialized to zero?
-# Or do we just create an empty list
-common_prefix_array = []
-previous = None
-for suffix in suffix_array:
-    token = token_array[suffix]
-    if token == previous:
-        common_prefix_array.append(1)
-    else:
-        common_prefix_array.append(0)
-    previous = token
+    create_common_prefix_array()
 
-print(common_prefix_array)
+    print(common_prefix_array)
+
+    # now we are going to try build skipgrams
+    # to determine which ones we want we need to build a histogram
+    # we do that on a token by token basis
+
+
+main()
