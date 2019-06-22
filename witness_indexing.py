@@ -83,13 +83,15 @@ def create_common_prefix_intervals():
     only_ones_generator = ((idx, prefix) for idx, prefix in prefix_generator if prefix == 1)
     only_zeroes_generator = ((idx, prefix) for idx, prefix in prefix_generator if prefix == 0)
 
+    common_prefix_intervals = []
+
     while True:
         start, common = next(only_ones_generator, (-1, None))
         if start == -1:
             break
-        print("start is ", start - 1)
         end, common = next(only_zeroes_generator, (start+1, None))
-        print("end is ", end - 1)
+        common_prefix_intervals.append((start-1, end-1))
+    return common_prefix_intervals
 
 
 # show the suffix array
@@ -147,7 +149,8 @@ def main():
     # we do that on a token by token basis
     # First we need to walk over the common prefix array
 
-    create_common_prefix_intervals()
+    common_prefix_intervals = create_common_prefix_intervals()
+    print(common_prefix_intervals)
 
     # skip_bigrams = create_skip_bigrams_for_suffix_interval(start-1, end-1)
     # print(skip_bigrams)
