@@ -78,6 +78,22 @@ def create_common_prefix_array():
         previous = token
 
 
+def create_common_prefix_intervals():
+    prefix_generator = enumerate(common_prefix_array)
+    only_ones_generator = ((idx, prefix) for idx, prefix in prefix_generator if prefix == 1)
+    only_zeroes_generator = ((idx, prefix) for idx, prefix in prefix_generator if prefix == 0)
+
+    common_prefix_intervals = []
+
+    while True:
+        start, common = next(only_ones_generator, (-1, None))
+        if start == -1:
+            break
+        end, common = next(only_zeroes_generator, (start+1, None))
+        common_prefix_intervals.append((start-1, end-1))
+    return common_prefix_intervals
+
+
 # show the suffix array
 def _show_suffix_array(_suffix_array):
     for token_pointer in _suffix_array:
@@ -86,6 +102,27 @@ def _show_suffix_array(_suffix_array):
         sub_token_array = sub_token_array[0:a]
         if sub_token_array:
             print(sub_token_array)
+
+
+# start and end specify an interval over the suffix array
+# end is inclusive
+def create_skip_bigrams_for_suffix_interval(start, end):
+    skip_bigrams = []
+    for suffix_idx in range(start, end+1):
+        token_idx = suffix_array[suffix_idx]
+        sub_token_array = token_array[token_idx+1:]
+        # pay attention to the fix limit that is included here!
+        a = next((idx for idx, x in enumerate(sub_token_array) if x[0] == "$"), 10)
+        # print in case of need of debugging
+        # sub_token_array = sub_token_array[0:a]
+        # if sub_token_array:
+        #     print(token_array[token_idx], sub_token_array)
+
+        # create skip bigrams
+        start_token_idx = token_idx
+        for end_token_idx in range(start_token_idx+1, start_token_idx+1+a):
+            skip_bigrams.append((start_token_idx, end_token_idx))
+    return skip_bigrams
 
 
 def main():
@@ -102,15 +139,27 @@ def main():
     global suffix_array
     suffix_array = _create_suffix_array(token_array)
     print(suffix_array)
-    _show_suffix_array(suffix_array)
+
+    # _show_suffix_array(suffix_array)
 
     create_common_prefix_array()
-
     print(common_prefix_array)
+
+    common_prefix_intervals = create_common_prefix_intervals()
+    print(common_prefix_intervals)
 
     # now we are going to try build skipgrams
     # to determine which ones we want we need to build a histogram
     # we do that on a token by token basis
 
+    for common_prefix_interval in common_prefix_intervals:
+        start, end = common_prefix_interval
+        skip_bigrams = create_skip_bigrams_for_suffix_interval(start, end)
+        print(skip_bigrams)
+
+
+
 
 main()
+
+
