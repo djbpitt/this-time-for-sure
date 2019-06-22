@@ -78,7 +78,7 @@ with open('stopwords.txt') as f:
 # key is skip-bigram
 # value is list of (siglum, pos0, pos1) tuple, with positions of skipgram characters
 
-csTable = generate_skipgrams(data=witnessData, skip=1, length=2)
+csTable = generate_skipgrams(data=witnessData, skip=3, length=3)
 
 ###
 # Sort table into common sequence list (csList; just bigrams, without witness data)
@@ -92,8 +92,8 @@ csList = [key for key in
                                          k  # alphabetical
                                          ))]
 
-for k in csList:
-    print(k, len({entry[0] for entry in csTable[k]}), len({entry[0] for entry in csTable[k]}) / len(csTable[k]))
+# for k in csList:
+#     print(k, len({entry[0] for entry in csTable[k]}), len({entry[0] for entry in csTable[k]}) / len(csTable[k]))
 ###
 # bitArrays tracks the tokens we've already placed
 ###
@@ -108,7 +108,8 @@ for ba in bitArrays.values():  # initialize bitarrays to all 0 values
 # ###
 toList = []
 toList.extend([Node('#start'), Node('#end')])
-for skipgram in tqdm(csList): # skipgram is a tuple of skipgram items; progress bar
+for n, skipgram in enumerate(tqdm(csList)): # skipgram is a tuple of skipgram items; progress bar
+    print(n, csTable[skipgram])
     locations = csTable[skipgram]  # list of three-item tuples of (siglum, location1, location2)
     for skipgramPos in range(len(skipgram)):  # loop over head and tail by position ([0, 1])
         norm = skipgram[skipgramPos]  # normalized value of each token in skipgram by position
@@ -218,7 +219,7 @@ for rank, nodes in nodesByRank.items():  # add a column for each rank
 # print('\n## Input')
 # for item in witnessData.items():
 #     print(item)
-# print('\n## csTable')
+print('\n## csTable')
 pp.pprint(csTable) # full table
 # pp.pprint(dict(itertools.islice(csTable.items(), 10))) # first 10 items
 print('\n## Formatted iew of csTable')
