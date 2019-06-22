@@ -78,6 +78,21 @@ def create_common_prefix_array():
         previous = token
 
 
+def create_common_prefix_intervals():
+    prefix_generator = enumerate(common_prefix_array)
+    only_ones_generator = ((idx, prefix) for idx, prefix in prefix_generator if prefix == 1)
+    only_zeroes_generator = ((idx, prefix) for idx, prefix in prefix_generator if prefix == 0)
+
+    while True:
+        start, common = next(only_ones_generator, -1)
+        if start == -1:
+            break
+
+        print("start is ", start - 1)
+        end, common = next(only_zeroes_generator)
+        print("end is ", end - 1)
+
+
 # show the suffix array
 def _show_suffix_array(_suffix_array):
     for token_pointer in _suffix_array:
@@ -133,28 +148,12 @@ def main():
     # we do that on a token by token basis
     # First we need to walk over the common prefix array
 
-    prefix_generator = enumerate(common_prefix_array)
-    only_ones_generator = ((idx, prefix) for idx, prefix in prefix_generator if prefix == 1)
-    only_zeroes_generator = ((idx, prefix) for idx, prefix in prefix_generator if prefix == 0)
+    create_common_prefix_intervals()
 
-    start, common = next(only_ones_generator)
-    print("start is ", start-1)
-    end, common = next(only_zeroes_generator)
-    print("end is ", end-1)
+    # skip_bigrams = create_skip_bigrams_for_suffix_interval(start-1, end-1)
+    # print(skip_bigrams)
 
-    skip_bigrams = create_skip_bigrams_for_suffix_interval(start-1, end-1)
-    print(skip_bigrams)
 
-    # for idx, has_common_prefix in enumerate(common_prefix_array):
-    #     if has_common_prefix == 0:
-    #         continue
-    #
-    #     print("start is ",idx-1)
-    #
-    #     # need to search for the 0 now
-    #     # better use a generator
-    #
-    #     pass
 
 
 main()
