@@ -31,7 +31,11 @@ class Node(object):
 # TODO: At the moment we look only at skip-bigrams. Other lengths?
 
 # Sample data
-witnessData = {'wit1': ['a', 'b', 'c', 'd', 'e'],
+# witnessData = {'wit1': ['a', 'b', 'c', 'd', 'e'],
+#                'wit2': ['a', 'e', 'c', 'd'],
+#                'wit3': ['a', 'd', 'b']}
+
+witnessData = {'wit1': ['a', 'b', 'c', 'a', 'd', 'e'],
                'wit2': ['a', 'e', 'c', 'd'],
                'wit3': ['a', 'd', 'b']}
 
@@ -94,7 +98,7 @@ for witOrder in witOrders:
                     if toList[pos].norm == norm:
                         modifyMe = toList[pos]
                         break
-                # if there is a dictionary to modify, do it; otherwise insert a new dictionary at the ceiling
+                # if there is a dictionary to modify, do it; otherwise insert a new dictionary as new ceiling
                 if modifyMe is None:
                     new_token = Node(norm)
                     new_token.add_location(siglum, offset)
