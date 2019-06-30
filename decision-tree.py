@@ -21,9 +21,9 @@ witnessData = {'wit1': ['a', 'b', 'c', 'a', 'd', 'e'],
 # fake stoplist, to ensure that we can identify stopwords and process them last
 stoplist = {'a', 'c'}  # set
 
-# bitArrays is used to keep track of which witness tokens have already been processed
-bitArrays = {k: bitarray(len(witnessData[k])) for k in witnessData}  # create a bitarray the length of each witness
-for ba in bitArrays.values():  # initialize bitarrays to all 0 values
+# bitArray_dict is used to keep track of which witness tokens have already been processed
+bitArray_dict = {k: bitarray(len(witnessData[k])) for k in witnessData}  # create a bitarray the length of each witness
+for ba in bitArray_dict.values():  # initialize bitarrays to all 0 values
     ba.setall(0)
 
 # csTable: dictionary, in which
@@ -95,9 +95,9 @@ class dtNode(object):
     ###
     # topologically ordered list, dictionary of bitarrays, dataframe with remaining options
     ###
-    def __init__(self, _toList, _bitArrays, _df):
+    def __init__(self, _toList, _bitArray_dict, _df):
         self.toList = _toList
-        self.bitArrays = _bitArrays
+        self.bitArray_dict = _bitArray_dict
         self.df = _df
         self.children = []
 
@@ -105,8 +105,8 @@ class dtNode(object):
         return str(self.toList)
 
 
-# root of decision tree inherits empty toList, bitArrays with 0 values, and complete, sorted df
-dtRoot = dtNode([], bitArrays, csDf)
+# root of decision tree inherits empty toList, bitArray_dict with 0 values, and complete, sorted df
+dtRoot = dtNode([], bitArray_dict, csDf)
 
 # isolate next skipgram to process
 current = dtRoot.df.iloc[0, :]
@@ -121,8 +121,8 @@ pp.pprint(choices)
 # current["first"] and current["second"]
 parent = dtRoot
 for choice in choices:
-    newChild = dtNode(parent.toList.copy(), copy.deepcopy(parent.bitArrays), parent.df.copy())
-    print("\nNew choice:", choice, newChild.bitArrays)
+    newChild = dtNode(parent.toList.copy(), copy.deepcopy(parent.bitArray_dict), parent.df.copy())
+    print("\nNew choice:", choice, newChild.bitArray_dict)
     parent.children.append(newChild)
     for witnessToken in choice:
         print(witnessToken)
@@ -137,9 +137,9 @@ for choice in choices:
             ###
             # do we need to process it, or have we alreaady taken care of it?
             ###
-            if newChild.bitArrays[siglum][offset]:  # already set, so break for this location
+            if newChild.bitArray_dict[siglum][offset]:  # already set, so break for this location
                 print(siglum, offset, norm, "has already been processed")
                 continue
             else:
                 print("not processed yet; do it now")
-            newChild.bitArrays[siglum][offset] = 1  # record that we've processed this token
+            newChild.bitArray_dict[siglum][offset] = 1  # record that we've processed this token
