@@ -2,6 +2,7 @@ import pandas as pd
 import collections  # for defaultdict
 from bitarray import bitarray
 import pprint as pp
+import copy
 from prettytable import PrettyTable  # not part of anaconda distribution; install with pip
 import \
     pandas_profiling  # https://towardsdatascience.com/10-simple-hacks-to-speed-up-your-data-analysis-in-python
@@ -120,7 +121,7 @@ pp.pprint(choices)
 # current["first"] and current["second"]
 parent = dtRoot
 for choice in choices:
-    newChild = dtNode(dtRoot.toList.copy(), dtRoot.bitArrays.copy(), dtRoot.df.copy())
+    newChild = dtNode(parent.toList.copy(), copy.deepcopy(parent.bitArrays), parent.df.copy())
     print("\nNew choice:", choice, newChild.bitArrays)
     parent.children.append(newChild)
     for witnessToken in choice:
