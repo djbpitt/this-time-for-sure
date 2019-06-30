@@ -4,7 +4,8 @@ from bitarray import bitarray
 import pprint as pp
 from prettytable import PrettyTable  # not part of anaconda distribution; install with pip
 import \
-    pandas_profiling  # https://towardsdatascience.com/10-simple-hacks-to-speed-up-your-data-analysis-in-python-ec18c6396e6b
+    pandas_profiling  # https://towardsdatascience.com/10-simple-hacks-to-speed-up-your-data-analysis-in-python
+# -ec18c6396e6b
 import itertools  # permutations()
 import math  # factorial()
 
@@ -70,11 +71,12 @@ csDf.reset_index(inplace=True, drop=True)  # update row numbers
 
 
 class Node(object):
-    def __init__(self, norm):
+    def __init__(self, _norm):
         self.tokendata = {}  # members are tokens (witness:offset pairs); no tokens for start and end nodes
-        self.norm = norm  # string value of node;
-        # here all values are pre-normalized, so the n value on the node is equal to the (implicit) t value on the witness tokens
-        # in Real Life, witness tokens will have t values that may differ from their shared n value that appears on the node
+        self.norm = _norm  # string value of node;
+        # here all values are pre-normalized, so the n value on the node is equal to the (implicit) t value on the
+        # witness tokens in Real Life, witness tokens will have t values that may differ from their shared n value
+        # that appears on the node
         self.rank = None
 
     def __repr__(self):
@@ -83,8 +85,8 @@ class Node(object):
     def __lt__(self, other):  # make it sortable by norm value
         return self.norm < other.norm
 
-    def add_location(self, siglum, offset):
-        self.tokendata[siglum] = offset
+    def add_location(self, _siglum, _offset):
+        self.tokendata[_siglum] = _offset
 
 
 # Decision-tree node
