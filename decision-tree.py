@@ -4,11 +4,8 @@ from bitarray import bitarray
 import pprint as pp
 import copy
 from prettytable import PrettyTable  # not part of anaconda distribution; install with pip
-import \
-    pandas_profiling  # https://towardsdatascience.com/10-simple-hacks-to-speed-up-your-data-analysis-in-python
-# -ec18c6396e6b
 import itertools  # permutations()
-import math  # factorial()
+
 
 class Node(object):
     def __init__(self, _norm):
@@ -43,12 +40,13 @@ class dtNode(object):
     def __repr__(self):
         return str(self.toList)
 
-def create_edge_list(_toList):
-    '''Create and return aa list of edges from the topologically ordered list of alignment nodes
+
+def create_edge_list(_toList: list) -> set:
+    """Create and return aa list of edges from the topologically ordered list of alignment nodes
 
     :param _toList: list of Node() objects
     :return: set of directed edges as (source, target) tuples
-    '''
+    """
     _edgeSets = collections.defaultdict(list)  # key = siglum, value = list of node (source, target) tuples
     _edgeSourceByWitness = {}  # last target will be next source
     for _node in _toList:  # token.norm is str; token.tokendata is dict with siglum:offset items
@@ -65,6 +63,56 @@ def create_edge_list(_toList):
                 _edgeSourceByWitness[_key] = _node
     _edges = set(_inner for _outer in _edgeSets.values() for _inner in _outer)  # tuples of Tokens
     return _edges
+
+
+def rank_nodes(_toList: list, _edges: set) -> pd.DataFrame:
+    """Rank nodes and return df
+
+    :param _toList: list of Node() objects
+    :param _edges: set of directed edges (source, target) tuples
+    :return: norm, tokendata, and rank of nodes as df
+    """
+    _findMySources = collections.defaultdict(list)
+    for _edge in _edges:
+        _findMySources[_edge[1]].append(_edge[0])
+    for _item in _toList:
+        _inEdges = _findMySources[_item]
+        _item.rank = max([r.rank for r in _inEdges], default=-1) + 1
+    _node_table = pd.DataFrame([(_item, _item.tokendata, _item.rank) for _item in _toList])
+    _node_table.columns = ["norm", "tokendata", "rank"]
+    return _node_table
+
+
+def create_alignment_table(_toList: list, _witnessData: dict, _nodesByRank: pd.DataFrame) -> PrettyTable:
+    """Create alignment table as PrettyTable
+
+    :param _toList: list of Node() objects
+    :param _witnessData: dictionary with sigla as keys and lists of tokens as values
+    :param _nodesByRank: norm, tokendata, and rank of nodes as df
+    :return: ASCII alignment table as PrettyTable
+    """
+    _nodesByRank = collections.defaultdict(list)
+    for _node in _toList:
+        _nodesByRank[_node.rank].append(_node)
+    _table = PrettyTable(header=False)
+    _orderedSigla = sorted(_witnessData.keys())
+    _table.add_column(None, [_key for _key in _orderedSigla])
+    for _rank, _nodes in _nodesByRank.items():  # add a column for each rank
+        _columnTokens = {}
+        for _node in _nodes:  # copy tokens from all nodes at rank into a single dictionary; value is string (not
+            # offset)
+            for _key in _node.tokendata.keys():
+                _columnTokens[_key] = _node.norm
+        _columnData = []
+        for _siglum in _orderedSigla:
+            if _siglum in _columnTokens:
+                _columnData.append(_columnTokens[_siglum])
+            elif _node.norm in ["#start", "#end"]:
+                _columnData.append(_node.norm)
+            else:
+                _columnData.append('')
+        _table.add_column(None, _columnData)
+    return _table
 
 
 # sample data with a bit of repetition
@@ -115,15 +163,14 @@ csDf["witness_uniqueness"] = csDf["local_witnessCount"] == csDf["unique_witnessC
 # are both tokens are stopwords? (if so, we’ll process them last)
 csDf["stopwords"] = csDf[["first", "second"]].T.isin(stoplist).all()
 
-# sort and update row numbers, so that we can travese the skipgrams as follows
-#   (not currently using stopword list to flter)
+# sort and update row numbers, so that we can traverse the skipgrams as follows
+#   (not currently using stopword list to filter)
 #   1. Words that don’t repeat within a witness first
 #   2. Within that, deepest block (most witnesses) first
 #   3. within that, rarest skipgrams first (less repetition is easier to place correctly)
 csDf.sort_values(by=["unique_witnessCount", "witness_uniqueness", "local_witnessCount"], ascending=[False, False, True],
                  inplace=True)
 csDf.reset_index(inplace=True, drop=True)  # update row numbers
-
 
 # root of decision tree inherits empty toList, bitArray_dict with 0 values, and complete, sorted df
 dtRoot = dtNode([Node("#start"), Node("#end")], bitArray_dict, csDf)
@@ -155,7 +202,7 @@ for choice in choices:
             offset = witnessToken[position + 1]
             print(siglum, offset, norm)
             ###
-            # do we need to process it, or have we alreaady taken care of it?
+            # do we need to process it, or have we already taken care of it?
             ###
             if newChild.bitArray_dict[siglum][offset]:  # already set, so break for this location
                 print(siglum, offset, norm, "has already been processed")
@@ -163,3 +210,6 @@ for choice in choices:
             else:
                 print("not processed yet; do it now")
             newChild.bitArray_dict[siglum][offset] = 1  # record that we've processed this token
+    print(create_alignment_table(newChild.toList, witnessData,
+                                 rank_nodes(newChild.toList, create_edge_list(newChild.toList))))
+
