@@ -10,8 +10,62 @@ import \
 import itertools  # permutations()
 import math  # factorial()
 
-pd.set_option('display.max_columns', 100)
-pd.set_option('display.max_colwidth', 150)
+class Node(object):
+    def __init__(self, _norm):
+        self.tokendata = {}  # members are tokens (witness:offset pairs); no tokens for start and end nodes
+        self.norm = _norm  # string value of node;
+        # here all values are pre-normalized, so the n value on the node is equal to the (implicit) t value on the
+        # witness tokens in Real Life, witness tokens will have t values that may differ from their shared n value
+        # that appears on the node
+        self.rank = None
+
+    def __repr__(self):
+        return self.norm
+
+    def __lt__(self, other):  # make it sortable by norm value
+        return self.norm < other.norm
+
+    def add_location(self, _siglum, _offset):
+        self.tokendata[_siglum] = _offset
+
+
+# Decision-tree node
+class dtNode(object):
+    ###
+    # topologically ordered list, dictionary of bitarrays, dataframe with remaining options
+    ###
+    def __init__(self, _toList, _bitArray_dict, _df):
+        self.toList = _toList
+        self.bitArray_dict = _bitArray_dict
+        self.df = _df
+        self.children = []
+
+    def __repr__(self):
+        return str(self.toList)
+
+def create_edge_list(_toList):
+    '''Create and return aa list of edges from the topologically ordered list of alignment nodes
+
+    :param _toList: list of Node() objects
+    :return: set of directed edges as (source, target) tuples
+    '''
+    _edgeSets = collections.defaultdict(list)  # key = siglum, value = list of node (source, target) tuples
+    _edgeSourceByWitness = {}  # last target will be next source
+    for _node in _toList:  # token.norm is str; token.tokendata is dict with siglum:offset items
+        if _node.norm == '#start':  # not an edge target, so don’t add an edge, but set up source for next edge
+            for _siglum in witnessData:
+                _edgeSourceByWitness[_siglum] = _node
+        elif _node.norm == '#end':  # create edges to #end for all witnesses
+            for _siglum in witnessData:
+                _edgeSets[_siglum].append((_edgeSourceByWitness[_siglum], _node))
+        else:
+            for _key, _value in _node.tokendata.items():
+                # add next witness-specific edge, update value in edgeSourceByWitness
+                _edgeSets[_key].append((_edgeSourceByWitness[_key], _node))
+                _edgeSourceByWitness[_key] = _node
+    _edges = set(_inner for _outer in _edgeSets.values() for _inner in _outer)  # tuples of Tokens
+    return _edges
+
 
 # sample data with a bit of repetition
 witnessData = {'wit1': ['a', 'b', 'c', 'a', 'd', 'e'],
@@ -71,42 +125,8 @@ csDf.sort_values(by=["unique_witnessCount", "witness_uniqueness", "local_witness
 csDf.reset_index(inplace=True, drop=True)  # update row numbers
 
 
-class Node(object):
-    def __init__(self, _norm):
-        self.tokendata = {}  # members are tokens (witness:offset pairs); no tokens for start and end nodes
-        self.norm = _norm  # string value of node;
-        # here all values are pre-normalized, so the n value on the node is equal to the (implicit) t value on the
-        # witness tokens in Real Life, witness tokens will have t values that may differ from their shared n value
-        # that appears on the node
-        self.rank = None
-
-    def __repr__(self):
-        return self.norm
-
-    def __lt__(self, other):  # make it sortable by norm value
-        return self.norm < other.norm
-
-    def add_location(self, _siglum, _offset):
-        self.tokendata[_siglum] = _offset
-
-
-# Decision-tree node
-class dtNode(object):
-    ###
-    # topologically ordered list, dictionary of bitarrays, dataframe with remaining options
-    ###
-    def __init__(self, _toList, _bitArray_dict, _df):
-        self.toList = _toList
-        self.bitArray_dict = _bitArray_dict
-        self.df = _df
-        self.children = []
-
-    def __repr__(self):
-        return str(self.toList)
-
-
 # root of decision tree inherits empty toList, bitArray_dict with 0 values, and complete, sorted df
-dtRoot = dtNode([], bitArray_dict, csDf)
+dtRoot = dtNode([Node("#start"), Node("#end")], bitArray_dict, csDf)
 
 # isolate next skipgram to process
 current = dtRoot.df.iloc[0, :]
