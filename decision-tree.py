@@ -8,6 +8,8 @@ import itertools  # permutations()
 
 
 class Node(object):
+    """Node in topologically ordered list"""
+
     def __init__(self, _norm):
         self.tokendata = {}  # members are tokens (witness:offset pairs); no tokens for start and end nodes
         self.norm = _norm  # string value of node;
@@ -26,15 +28,13 @@ class Node(object):
         self.tokendata[_siglum] = _offset
 
 
-# Decision-tree node
 class dtNode(object):
-    ###
-    # topologically ordered list, dictionary of bitarrays, dataframe with remaining options
-    ###
+    """Node in decision tree"""
+
     def __init__(self, _toList, _bitArray_dict, _df):
-        self.toList = _toList
-        self.bitArray_dict = _bitArray_dict
-        self.df = _df
+        self.toList = _toList  # topologically ordered list
+        self.bitArray_dict = _bitArray_dict  # dictionary of bitarray
+        self.df = _df  # dataframe with remaining options
         self.children = []
 
     def __repr__(self):
@@ -115,6 +115,51 @@ def create_alignment_table(_toList: list, _witnessData: dict, _nodesByRank: pd.D
     return _table
 
 
+def place_token(_toList, _norm, _siglum, _offset):
+    ###
+    # since we didn’t break, create a new node and figure out where to place it
+    ###
+    _modifyMe = None  # flag that tells us whether we need to modify an existing node (or create a new one)
+    _floor = 0  # floor and ceiling frame the locations where the new node can be placed
+    _ceiling = len(_toList) - 1
+    ###
+    # find floor and ceiling
+    ###
+    for _nodePos in range(len(_toList)):  # determine floor and ceiling by scanning nodes
+        _currentDict = _toList[_nodePos].tokendata  # keys are a list of witnesses on token
+        if _siglum not in _currentDict.keys():  # this dictionary isn't relevant; look at the next one
+            pass
+        else:  # is it a new floor or a new ceiling? (we've already filtered out the == case)
+            if _currentDict[_siglum] < _offset:  # move up the floor if the new offset is
+                # greater than a node already there
+                _floor = _nodePos + 1
+            else:  # we’ve hit the ceiling if the new offset is less than the old one
+                _ceiling = _nodePos
+                break
+
+    ###
+    # scan from floor to ceiling, looking for matching 'norm' value
+    #
+    # if there is a dictionary to modify, save it as modifyMe (don't modify it yet)
+    # TODO: this gets the leftmost if there is more than one, which is not necessarily optimal
+    ###
+    for _pos in range(_floor, _ceiling):
+        if _toList[_pos].norm == _norm:
+            _modifyMe = _toList[_pos]
+            break
+    ###
+    # if there is a dictionary to modify, do it; otherwise insert a new dictionary at the ceiling
+    # TODO: why at the ceiling?
+    ###
+    if _modifyMe is None:  # create and insert new token
+        _new_token = Node(_norm)
+        _new_token.add_location(_siglum, _offset)
+        _toList.insert(_ceiling, _new_token)
+    else:  # modify existing token
+        _modifyMe.tokendata[_siglum] = _offset
+    return _toList
+
+
 # sample data with a bit of repetition
 witnessData = {'wit1': ['a', 'b', 'c', 'a', 'd', 'e'],
                'wit2': ['a', 'e', 'c', 'd'],
@@ -188,7 +233,8 @@ pp.pprint(choices)
 # current["first"] and current["second"]
 parent = dtRoot
 for choice in choices:
-    newChild = dtNode(parent.toList.copy(), copy.deepcopy(parent.bitArray_dict), parent.df.copy())
+    newChild = dtNode(parent.toList.copy(), copy.deepcopy(parent.bitArray_dict),
+                      parent.df.copy().iloc[1:, :])  # pop top of parent df and copy remainder to child
     print("\nNew choice:", choice, newChild.bitArray_dict)
     parent.children.append(newChild)
     for witnessToken in choice:
@@ -198,18 +244,16 @@ for choice in choices:
             ###
             # what siglum and offset are we looking for?
             ###
-            siglum = witnessToken[0]
-            offset = witnessToken[position + 1]
+            siglum: str = witnessToken[0]
+            offset: int = witnessToken[position + 1]
             print(siglum, offset, norm)
             ###
             # do we need to process it, or have we already taken care of it?
             ###
             if newChild.bitArray_dict[siglum][offset]:  # already set, so break for this location
-                print(siglum, offset, norm, "has already been processed")
                 continue
             else:
-                print("not processed yet; do it now")
-            newChild.bitArray_dict[siglum][offset] = 1  # record that we've processed this token
+                place_token(newChild.toList, norm, siglum, offset)
+                newChild.bitArray_dict[siglum][offset] = 1  # record that we've processed this token
     print(create_alignment_table(newChild.toList, witnessData,
                                  rank_nodes(newChild.toList, create_edge_list(newChild.toList))))
-
