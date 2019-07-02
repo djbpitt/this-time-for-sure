@@ -83,7 +83,7 @@ def rank_nodes(_toList: list, _edges: set) -> pd.DataFrame:
     return _node_table
 
 
-def create_alignment_table(_toList: list, _witnessData: dict, _nodesByRank: pd.DataFrame) -> PrettyTable:
+def create_alignment_table(_toList: list, _witnessData: dict, _nodesByRank: pd.DataFrame, _offsets = None) -> PrettyTable:
     """Create alignment table as PrettyTable
 
     :param _toList: list of Node() objects
@@ -103,6 +103,8 @@ def create_alignment_table(_toList: list, _witnessData: dict, _nodesByRank: pd.D
             # offset)
             for _key in _node.tokendata.keys():
                 _columnTokens[_key] = _node.norm
+                if _offsets:
+                    _columnTokens[_key] += "".join(["(", str(_node.tokendata[_key]), ")"])
         _columnData = []
         for _siglum in _orderedSigla:
             if _siglum in _columnTokens:
@@ -114,6 +116,12 @@ def create_alignment_table(_toList: list, _witnessData: dict, _nodesByRank: pd.D
         _table.add_column(None, _columnData)
     return _table
 
+
+def calculate_score(_node): # witness tokens placed / length of toList
+    wit_tokens_placed = sum([len(item.tokendata) for item in newChild.toList])
+    toList_length = len(newChild.toList) - 2
+    score = toList_length / wit_tokens_placed
+    return score
 
 def place_token(_toList, _norm, _siglum, _offset):
     ###
@@ -228,17 +236,17 @@ d = collections.defaultdict(list)
 for i in current.locations:
     d[i[0]].append(i)
 choices = list(itertools.product(*d.values()))
-pp.pprint(choices)
+# pp.pprint(choices)
 
 # current["first"] and current["second"]
 parent = dtRoot
 for choice in choices:
     newChild = dtNode(parent.toList.copy(), copy.deepcopy(parent.bitArray_dict),
                       parent.df.copy().iloc[1:, :])  # pop top of parent df and copy remainder to child
-    print("\nNew choice:", choice, newChild.bitArray_dict)
+    # print("\nNew choice:", choice, newChild.bitArray_dict)
     parent.children.append(newChild)
     for witnessToken in choice:
-        print(witnessToken)
+        # print(witnessToken)
         for position, norm in enumerate(
                 [current["first"], current["second"]]):  # position (0, 1) is first or second skipgram token
             ###
@@ -246,7 +254,7 @@ for choice in choices:
             ###
             siglum: str = witnessToken[0]
             offset: int = witnessToken[position + 1]
-            print(siglum, offset, norm)
+            # print(siglum, offset, norm)
             ###
             # do we need to process it, or have we already taken care of it?
             ###
@@ -256,4 +264,7 @@ for choice in choices:
                 place_token(newChild.toList, norm, siglum, offset)
                 newChild.bitArray_dict[siglum][offset] = 1  # record that we've processed this token
     print(create_alignment_table(newChild.toList, witnessData,
-                                 rank_nodes(newChild.toList, create_edge_list(newChild.toList))))
+                                 rank_nodes(newChild.toList, create_edge_list(newChild.toList)), True))
+    print("Score (witness tokens / toList length): ", calculate_score(newChild))
+
+
