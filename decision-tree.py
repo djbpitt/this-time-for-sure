@@ -126,7 +126,7 @@ def calculate_score(_node: dtNode) -> float:
     """
     wit_tokens_placed: int = sum([len(item.tokendata) for item in _node.toList])
     toList_length: int = len(_node.toList) - 2
-    score: float = toList_length / wit_tokens_placed
+    score: float = wit_tokens_placed / toList_length
     return score
 
 
@@ -188,9 +188,10 @@ def expand_dtNode(_parent: dtNode):
     for _i in _current.locations:
         _d[_i[0]].append(_i)
     _choices: list = list(itertools.product(*_d.values()))
+    print("There are", len(_choices), "choices at this level")
     for _choice in _choices:
-        _newChild = dtNode(parent.toList.copy(), copy.deepcopy(parent.bitArray_dict),
-                           parent.df.copy().iloc[1:, :])  # pop top of parent df and copy remainder to child
+        _newChild = dtNode(copy.deepcopy(_parent.toList), copy.deepcopy(_parent.bitArray_dict),
+                           _parent.df.copy().iloc[1:, :])  # pop top of parent df and copy remainder to child
         _parent.children.append(_newChild)  # parents know who their children are
         for _witnessToken in _choice:
             for _position, _norm in enumerate(
@@ -203,6 +204,7 @@ def expand_dtNode(_parent: dtNode):
                 ###
                 # do we need to process it, or have we already taken care of it?
                 ###
+                # print(_newChild.bitArray_dict)
                 if _newChild.bitArray_dict[_siglum][_offset]:  # already set, so break for this location
                     continue
                 else:
@@ -293,7 +295,13 @@ dtRoot = dtNode([Node("#start"), Node("#end")], bitArray_dict, csDf)
 
 # process root
 parent: dtNode = dtRoot
-expand_dtNode(parent)  # expands in place
+expand_dtNode(parent)  # expands in place, adds children
 for child in parent.children:
-    print_alignment_table(child, witnessData, True)
+    print("One level down")
+    print_alignment_table(child, witnessData, True) # before expanding
     print_score(child)
+    expand_dtNode(child) # adds grandchildren
+    for grandchild in child.children:
+        print("Two levels down")
+        print_alignment_table(grandchild, witnessData, True)
+        print_score(grandchild)
