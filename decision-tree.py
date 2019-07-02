@@ -83,12 +83,13 @@ def rank_nodes(_toList: list, _edges: set) -> pd.DataFrame:
     return _node_table
 
 
-def create_alignment_table(_toList: list, _witnessData: dict, _nodesByRank: pd.DataFrame, _offsets = None) -> PrettyTable:
+def create_alignment_table(_toList: list, _witnessData: dict, _nodesByRank: pd.DataFrame, _offsets=None) -> PrettyTable:
     """Create alignment table as PrettyTable
 
-    :param _toList: list of Node() objects
-    :param _witnessData: dictionary with sigla as keys and lists of tokens as values
-    :param _nodesByRank: norm, tokendata, and rank of nodes as df
+    :param _toList: list: Node() objects
+    :param _witnessData: dict: sigla as keys and lists of tokens as values
+    :param _nodesByRank: pd.DataFrame: norm, tokendata, and rank of nodes
+    :param _offsets: bool: print offsets for debugging
     :return: ASCII alignment table as PrettyTable
     """
     _nodesByRank = collections.defaultdict(list)
@@ -117,11 +118,17 @@ def create_alignment_table(_toList: list, _witnessData: dict, _nodesByRank: pd.D
     return _table
 
 
-def calculate_score(_node): # witness tokens placed / length of toList
-    wit_tokens_placed = sum([len(item.tokendata) for item in newChild.toList])
-    toList_length = len(newChild.toList) - 2
-    score = toList_length / wit_tokens_placed
+def calculate_score(_node: dtNode) -> float:
+    """  Score = witness tokens placed / length of toList
+
+    :param _node: dtNode to score
+    :return: score as float
+    """
+    wit_tokens_placed: int = sum([len(item.tokendata) for item in _node.toList])
+    toList_length: int = len(_node.toList) - 2
+    score: float = toList_length / wit_tokens_placed
     return score
+
 
 def place_token(_toList, _norm, _siglum, _offset):
     ###
@@ -166,6 +173,62 @@ def place_token(_toList, _norm, _siglum, _offset):
     else:  # modify existing token
         _modifyMe.tokendata[_siglum] = _offset
     return _toList
+
+
+def expand_dtNode(_parent: dtNode):
+    """ Add children to node in decision tree
+
+    :param _parent: dtNode: decision tree node to be expanded
+    :return: (none; expands in place)
+    """
+    # isolate next skipgram to process
+    _current: pd.Series = _parent.df.iloc[0, :]
+    # Identify all possible placements of skipgram
+    _d = collections.defaultdict(list)
+    for _i in _current.locations:
+        _d[_i[0]].append(_i)
+    _choices: list = list(itertools.product(*_d.values()))
+    for _choice in _choices:
+        _newChild = dtNode(parent.toList.copy(), copy.deepcopy(parent.bitArray_dict),
+                           parent.df.copy().iloc[1:, :])  # pop top of parent df and copy remainder to child
+        _parent.children.append(_newChild)  # parents know who their children are
+        for _witnessToken in _choice:
+            for _position, _norm in enumerate(
+                    [_current["first"], _current["second"]]):  # position (0, 1) is first or second skipgram token
+                ###
+                # what siglum and offset are we looking for?
+                ###
+                _siglum: str = _witnessToken[0]
+                _offset: int = _witnessToken[_position + 1]
+                ###
+                # do we need to process it, or have we already taken care of it?
+                ###
+                if _newChild.bitArray_dict[_siglum][_offset]:  # already set, so break for this location
+                    continue
+                else:
+                    place_token(_newChild.toList, _norm, _siglum, _offset)
+                    _newChild.bitArray_dict[_siglum][_offset] = 1  # record that we've processed this token
+
+
+def print_alignment_table(_dtNode: dtNode, _witnessData: dict, _print_witness_offset):
+    """ Print alignment table for decision tree node
+
+    :param _dtNode: dtNode: node to print
+    :param _witnessData: dict: witness token input
+    :param _print_witness_offset: bool: print offset of token in witness?
+    :return: (none)
+    """
+    print(create_alignment_table(_dtNode.toList, _witnessData,
+                                 rank_nodes(_dtNode.toList, create_edge_list(_dtNode.toList)), _print_witness_offset))
+
+
+def print_score(_dtNode: dtNode):
+    """ Print calculated score for decision tree node
+
+    :param _dtNode: dtNode: decision tree node to score
+    :return: (none)
+    """
+    print("Score (witness tokens / toList length): ", calculate_score(_dtNode))
 
 
 # sample data with a bit of repetition
@@ -228,43 +291,9 @@ csDf.reset_index(inplace=True, drop=True)  # update row numbers
 # root of decision tree inherits empty toList, bitArray_dict with 0 values, and complete, sorted df
 dtRoot = dtNode([Node("#start"), Node("#end")], bitArray_dict, csDf)
 
-# isolate next skipgram to process
-current = dtRoot.df.iloc[0, :]
-
-# Identify all possible placements of skipgram
-d = collections.defaultdict(list)
-for i in current.locations:
-    d[i[0]].append(i)
-choices = list(itertools.product(*d.values()))
-# pp.pprint(choices)
-
-# current["first"] and current["second"]
-parent = dtRoot
-for choice in choices:
-    newChild = dtNode(parent.toList.copy(), copy.deepcopy(parent.bitArray_dict),
-                      parent.df.copy().iloc[1:, :])  # pop top of parent df and copy remainder to child
-    # print("\nNew choice:", choice, newChild.bitArray_dict)
-    parent.children.append(newChild)
-    for witnessToken in choice:
-        # print(witnessToken)
-        for position, norm in enumerate(
-                [current["first"], current["second"]]):  # position (0, 1) is first or second skipgram token
-            ###
-            # what siglum and offset are we looking for?
-            ###
-            siglum: str = witnessToken[0]
-            offset: int = witnessToken[position + 1]
-            # print(siglum, offset, norm)
-            ###
-            # do we need to process it, or have we already taken care of it?
-            ###
-            if newChild.bitArray_dict[siglum][offset]:  # already set, so break for this location
-                continue
-            else:
-                place_token(newChild.toList, norm, siglum, offset)
-                newChild.bitArray_dict[siglum][offset] = 1  # record that we've processed this token
-    print(create_alignment_table(newChild.toList, witnessData,
-                                 rank_nodes(newChild.toList, create_edge_list(newChild.toList)), True))
-    print("Score (witness tokens / toList length): ", calculate_score(newChild))
-
-
+# process root
+parent: dtNode = dtRoot
+expand_dtNode(parent)  # expands in place
+for child in parent.children:
+    print_alignment_table(child, witnessData, True)
+    print_score(child)
