@@ -207,6 +207,7 @@ def expand_dtNode(_parent: dtNode):
     """
     # isolate next skipgram to process
     _current: pd.Series = _parent.df.iloc[0, :]
+    # _current, _remainder = step(_parent)
     # Identify all possible placements of skipgram
     _d = collections.defaultdict(list)
     for _i in _current.locations:
@@ -321,21 +322,24 @@ dtRoot = dtNode([Node("#start"), Node("#end")], bitArray_dict, csDf)
 
 # process root
 parent: dtNode = dtRoot
-current, remainder = step(csDf)
-print("current", current)
-print("remainder", remainder)
+expand_dtNode(parent)  # expands in place, adds children
+print(parent.children)
 
-current,remainder = step(remainder)
-print("current", current)
-print("remainder", remainder)
-
-current,remainder = step(remainder)
-print("current", current)
-print("remainder", remainder)
-
-current,remainder = step(remainder)
-print("current", current)
-print("remainder", remainder)
+# current, remainder = step(csDf)
+# print("current", current)
+# print("remainder", remainder)
+#
+# current,remainder = step(remainder)
+# print("current", current)
+# print("remainder", remainder)
+#
+# current,remainder = step(remainder)
+# print("current", current)
+# print("remainder", remainder)
+#
+# current,remainder = step(remainder)
+# print("current", current)
+# print("remainder", remainder)
 
 # expand_dtNode(parent)  # expands in place, adds children
 # for child in parent.children:
