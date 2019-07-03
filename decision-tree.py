@@ -175,6 +175,30 @@ def place_token(_toList, _norm, _siglum, _offset):
     return _toList
 
 
+def compute_priority(_df: pd.DataFrame):
+    """ Assign processing priority to skipgrams and use it to group and sort them
+
+    :param _df: dataframe to prioritize
+    :return: (none)
+
+    (not currently using stopword list to filter)
+    1. Deepest block (most witnesses) first (unique_witnessCount: int)
+    2. Within that, words that don’t repeat within a witness first (witness_uniqueness: bool)
+    3. within that, rarest skipgrams first (less repetition is easier to place correctly) (local_witnessCount: int)
+    """
+    _df.sort_values(by=["unique_witnessCount", "witness_uniqueness", "local_witnessCount"],
+                    ascending=[False, False, True], inplace=True)
+    _df.reset_index(inplace=True, drop=True)  # update row numbers
+
+
+def step(_df: pd.DataFrame):
+    """walk through rows grouped by priority"""
+    _top = max(_df["priority"])
+    _current = _df[_df["priority"] == _top]
+    _remainder = _df[_df["priority"] != _top]
+    return(_current, _remainder) # process current, then call again with remainder to continue
+
+
 def expand_dtNode(_parent: dtNode):
     """ Add children to node in decision tree
 
@@ -277,6 +301,8 @@ csDf["unique_witnesses"] = csDf["local_witnesses"].map(lambda x: set(x))
 csDf["local_witnessCount"] = csDf["local_witnesses"].str.len()
 csDf["unique_witnessCount"] = csDf["unique_witnesses"].str.len()
 csDf["witness_uniqueness"] = csDf["local_witnessCount"] == csDf["unique_witnessCount"]
+scale = pd.Series([100, -1, 10])
+csDf["priority"] = pd.np.dot(csDf[["unique_witnessCount", "witness_uniqueness", "local_witnessCount"]], scale)
 
 # are both tokens are stopwords? (if so, we’ll process them last)
 csDf["stopwords"] = csDf[["first", "second"]].T.isin(stoplist).all()
@@ -295,13 +321,29 @@ dtRoot = dtNode([Node("#start"), Node("#end")], bitArray_dict, csDf)
 
 # process root
 parent: dtNode = dtRoot
-expand_dtNode(parent)  # expands in place, adds children
-for child in parent.children:
-    print("One level down")
-    print_alignment_table(child, witnessData, True) # before expanding
-    print_score(child)
-    expand_dtNode(child) # adds grandchildren
-    for grandchild in child.children:
-        print("Two levels down")
-        print_alignment_table(grandchild, witnessData, True)
-        print_score(grandchild)
+current, remainder = step(csDf)
+print("current", current)
+print("remainder", remainder)
+
+current,remainder = step(remainder)
+print("current", current)
+print("remainder", remainder)
+
+current,remainder = step(remainder)
+print("current", current)
+print("remainder", remainder)
+
+current,remainder = step(remainder)
+print("current", current)
+print("remainder", remainder)
+
+# expand_dtNode(parent)  # expands in place, adds children
+# for child in parent.children:
+#     print("One level down")
+#     print_alignment_table(child, witnessData, True)  # before expanding
+#     print_score(child)
+#     expand_dtNode(child)  # adds grandchildren
+#     for grandchild in child.children:
+#         print("Two levels down")
+#         print_alignment_table(grandchild, witnessData, True)
+#         print_score(grandchild)
