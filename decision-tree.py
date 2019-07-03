@@ -199,15 +199,15 @@ def step(_df: pd.DataFrame):
     return(_current, _remainder) # process current, then call again with remainder to continue
 
 
-def expand_dtNode(_parent: dtNode):
+def expand_dtNode(_parent: dtNode, _new_row: pd.Series, _remaining_rows: pd.DataFrame):
     """ Add children to node in decision tree
 
     :param _parent: dtNode: decision tree node to be expanded
     :return: (none; expands in place)
     """
     # isolate next skipgram to process
-    _current: pd.Series = _parent.df.iloc[0, :]
-    # _current, _remainder = step(_parent)
+    # _current: pd.Series = _parent.df.iloc[0, :]
+    _current: pd.Series = _new_row
     # Identify all possible placements of skipgram
     _d = collections.defaultdict(list)
     for _i in _current.locations:
@@ -215,8 +215,10 @@ def expand_dtNode(_parent: dtNode):
     _choices: list = list(itertools.product(*_d.values()))
     print("There are", len(_choices), "choices at this level")
     for _choice in _choices:
+        _remainder = _remaining_rows.copy().sort_values(by="priority", ascending=False)
+        _remainder.reset_index(inplace=True)
         _newChild = dtNode(copy.deepcopy(_parent.toList), copy.deepcopy(_parent.bitArray_dict),
-                           _parent.df.copy().iloc[1:, :])  # pop top of parent df and copy remainder to child
+                           _remainder)  # pop top of parent df and copy remainder to child
         _parent.children.append(_newChild)  # parents know who their children are
         for _witnessToken in _choice:
             for _position, _norm in enumerate(
@@ -321,14 +323,21 @@ csDf.reset_index(inplace=True, drop=True)  # update row numbers
 dtRoot = dtNode([Node("#start"), Node("#end")], bitArray_dict, csDf)
 
 # process root
-parent: dtNode = dtRoot
-expand_dtNode(parent)  # expands in place, adds children
-print(parent.children)
+parent: dtNode = dtRoot # node to expand
+current, remainder = step(csDf) # current is rows to add, remainder is ... well ... what’s left
+for i in range(len(current)):
+    expand_dtNode(parent, current.iloc[i, :], pd.concat([current.drop(i, axis=0), remainder]))  # expands in place, adds children
+for child in parent.children:
+    print("One level down")
+    print_alignment_table(child, witnessData, True)  # before expanding
+    print_score(child)
+    current_c, remainder_c = step(child.df)
+    for j in range(len(current_c)):
+        expand_dtNode(child, current_c.iloc[j, :], pd.concat([current_c.drop(j, axis=0), remainder_c]))
+        for grandchild in child.children:
+            print_alignment_table(grandchild, witnessData, True)  # before expanding
+            print_score(grandchild)
 
-# current, remainder = step(csDf)
-# print("current", current)
-# print("remainder", remainder)
-#
 # current,remainder = step(remainder)
 # print("current", current)
 # print("remainder", remainder)
