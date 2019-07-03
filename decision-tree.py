@@ -216,7 +216,7 @@ def expand_dtNode(_parent: dtNode, _new_row: pd.Series, _remaining_rows: pd.Data
     print("There are", len(_choices), "choices at this level")
     for _choice in _choices:
         _remainder = _remaining_rows.copy().sort_values(by="priority", ascending=False)
-        _remainder.reset_index(inplace=True)
+        _remainder.reset_index(inplace=True, drop=True)
         _newChild = dtNode(copy.deepcopy(_parent.toList), copy.deepcopy(_parent.bitArray_dict),
                            _remainder)  # pop top of parent df and copy remainder to child
         _parent.children.append(_newChild)  # parents know who their children are
@@ -328,35 +328,21 @@ current, remainder = step(csDf) # current is rows to add, remainder is ... well 
 for i in range(len(current)):
     expand_dtNode(parent, current.iloc[i, :], pd.concat([current.drop(i, axis=0), remainder]))  # expands in place, adds children
 for child in parent.children:
-    print("One level down")
+    print("\nOne level down")
     print_alignment_table(child, witnessData, True)  # before expanding
     print_score(child)
     current_c, remainder_c = step(child.df)
     for j in range(len(current_c)):
         expand_dtNode(child, current_c.iloc[j, :], pd.concat([current_c.drop(j, axis=0), remainder_c]))
         for grandchild in child.children:
+            print("\nTwo levels down")
             print_alignment_table(grandchild, witnessData, True)  # before expanding
             print_score(grandchild)
+            current_d, remainder_d = step(grandchild.df)
+            for k in range(len(current_d)):
+                expand_dtNode(grandchild, current_d.iloc[k, :], pd.concat([current_d.drop(k, axis=0), remainder_d]))
+                for greatgrandchild in grandchild.children:
+                    print("\nThree levels down")
+                    print_alignment_table(greatgrandchild, witnessData, True)
+                    print_score(greatgrandchild)
 
-# current,remainder = step(remainder)
-# print("current", current)
-# print("remainder", remainder)
-#
-# current,remainder = step(remainder)
-# print("current", current)
-# print("remainder", remainder)
-#
-# current,remainder = step(remainder)
-# print("current", current)
-# print("remainder", remainder)
-
-# expand_dtNode(parent)  # expands in place, adds children
-# for child in parent.children:
-#     print("One level down")
-#     print_alignment_table(child, witnessData, True)  # before expanding
-#     print_score(child)
-#     expand_dtNode(child)  # adds grandchildren
-#     for grandchild in child.children:
-#         print("Two levels down")
-#         print_alignment_table(grandchild, witnessData, True)
-#         print_score(grandchild)
