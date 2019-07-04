@@ -130,7 +130,7 @@ def calculate_score(_node: dtNode) -> float:
     return score
 
 
-def place_token(_toList, _norm, _siglum, _offset):
+def place_token(_toList: list, _norm: str, _siglum: str, _offset: int):
     ###
     # since we didn’t break, create a new node and figure out where to place it
     ###
@@ -260,6 +260,11 @@ def print_score(_dtNode: dtNode):
     print("Score (witness tokens / toList length): ", calculate_score(_dtNode))
 
 
+def print_placed_witness_tokens(_dtNode:dtNode):
+    _ba_tmp = bitarray("".join([value.to01() for key, value in _dtNode.bitArray_dict.items()]))
+    return _ba_tmp.count() / _ba_tmp.length()  # percent of bits set
+
+
 # sample data with a bit of repetition
 witnessData = {'wit1': ['a', 'b', 'c', 'a', 'd', 'e'],
                'wit2': ['a', 'e', 'c', 'd'],
@@ -333,6 +338,7 @@ for child in parent.children:
     print_alignment_table(child, witnessData, True)  # before expanding
     print(child)
     print_score(child)
+    print("Percentage of witness tokens placed:", print_placed_witness_tokens(child))
     current_c, remainder_c = step(child.df)
     for j in range(len(current_c)):
         expand_dtNode(child, current_c.iloc[j, :], pd.concat([current_c.drop(j, axis=0), remainder_c]))
@@ -341,6 +347,7 @@ for child in parent.children:
             print_alignment_table(grandchild, witnessData, True)  # before expanding
             print(grandchild)
             print_score(grandchild)
+            print("Percentage of witness tokens placed:", print_placed_witness_tokens(grandchild))
             current_d, remainder_d = step(grandchild.df)
             for k in range(len(current_d)):
                 expand_dtNode(grandchild, current_d.iloc[k, :], pd.concat([current_d.drop(k, axis=0), remainder_d]))
@@ -349,4 +356,5 @@ for child in parent.children:
                     print_alignment_table(greatgrandchild, witnessData, True)
                     print(greatgrandchild)
                     print_score(greatgrandchild)
+                    print("Percentage of witness tokens placed:", print_placed_witness_tokens(greatgrandchild))
 
