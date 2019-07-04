@@ -327,28 +327,26 @@ parent: dtNode = dtRoot # node to expand
 current, remainder = step(csDf) # current is rows to add, remainder is ... well ... what’s left
 for i in range(len(current)):
     expand_dtNode(parent, current.iloc[i, :], pd.concat([current.drop(i, axis=0), remainder]))  # expands in place, adds children
-    # placed = current.iloc[i,:]["first"] + current.iloc[i,:]["second"]
-    # print("Placed:", placed)
+    print(parent)
 for child in parent.children:
     print("\nOne level down")
     print_alignment_table(child, witnessData, True)  # before expanding
+    print(child)
     print_score(child)
     current_c, remainder_c = step(child.df)
     for j in range(len(current_c)):
         expand_dtNode(child, current_c.iloc[j, :], pd.concat([current_c.drop(j, axis=0), remainder_c]))
-        # placed +=  (" " + current_c.iloc[j, :]["first"] + current_c.iloc[j, :]["second"])
-        # print("Placed:", placed)
         for grandchild in child.children:
             print("\nTwo levels down")
             print_alignment_table(grandchild, witnessData, True)  # before expanding
+            print(grandchild)
             print_score(grandchild)
             current_d, remainder_d = step(grandchild.df)
             for k in range(len(current_d)):
                 expand_dtNode(grandchild, current_d.iloc[k, :], pd.concat([current_d.drop(k, axis=0), remainder_d]))
-                # placed += (" " + current_d.iloc[k, :]["first"] + current_d.iloc[k, :]["second"])
-                # print("Placed:", placed)
                 for greatgrandchild in grandchild.children:
                     print("\nThree levels down")
                     print_alignment_table(greatgrandchild, witnessData, True)
+                    print(greatgrandchild)
                     print_score(greatgrandchild)
 
