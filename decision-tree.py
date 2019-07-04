@@ -213,7 +213,7 @@ def expand_dtNode(_parent: dtNode, _new_row: pd.Series, _remaining_rows: pd.Data
     for _i in _current.locations:
         _d[_i[0]].append(_i)
     _choices: list = list(itertools.product(*_d.values()))
-    print("There are", len(_choices), "choices at this level")
+    print("\nThere are", len(_choices), "choices at this level")
     for _choice in _choices:
         _remainder = _remaining_rows.copy().sort_values(by="priority", ascending=False)
         _remainder.reset_index(inplace=True, drop=True)
@@ -327,6 +327,8 @@ parent: dtNode = dtRoot # node to expand
 current, remainder = step(csDf) # current is rows to add, remainder is ... well ... what’s left
 for i in range(len(current)):
     expand_dtNode(parent, current.iloc[i, :], pd.concat([current.drop(i, axis=0), remainder]))  # expands in place, adds children
+    # placed = current.iloc[i,:]["first"] + current.iloc[i,:]["second"]
+    # print("Placed:", placed)
 for child in parent.children:
     print("\nOne level down")
     print_alignment_table(child, witnessData, True)  # before expanding
@@ -334,6 +336,8 @@ for child in parent.children:
     current_c, remainder_c = step(child.df)
     for j in range(len(current_c)):
         expand_dtNode(child, current_c.iloc[j, :], pd.concat([current_c.drop(j, axis=0), remainder_c]))
+        # placed +=  (" " + current_c.iloc[j, :]["first"] + current_c.iloc[j, :]["second"])
+        # print("Placed:", placed)
         for grandchild in child.children:
             print("\nTwo levels down")
             print_alignment_table(grandchild, witnessData, True)  # before expanding
@@ -341,6 +345,8 @@ for child in parent.children:
             current_d, remainder_d = step(grandchild.df)
             for k in range(len(current_d)):
                 expand_dtNode(grandchild, current_d.iloc[k, :], pd.concat([current_d.drop(k, axis=0), remainder_d]))
+                # placed += (" " + current_d.iloc[k, :]["first"] + current_d.iloc[k, :]["second"])
+                # print("Placed:", placed)
                 for greatgrandchild in grandchild.children:
                     print("\nThree levels down")
                     print_alignment_table(greatgrandchild, witnessData, True)
