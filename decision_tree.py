@@ -31,8 +31,9 @@ class Node(object):
 class dtNode(object):
     """Node in decision tree"""
 
-    def __init__(self, _toList, _bitArray_dict, _df):
+    def __init__(self, _toList, _skipgram, _bitArray_dict, _df):
         self.toList = _toList  # topologically ordered list
+        self.skipgram = _skipgram  # skipgram placed in this object
         self.bitArray_dict = _bitArray_dict  # dictionary of bitarray
         self.df = _df  # dataframe with remaining options
         self.children = []
@@ -41,9 +42,10 @@ class dtNode(object):
         return str(self.toList)
 
 
-def create_edge_list(_toList: list) -> set:
+def create_edge_list(_toList: list, _witnessData: dict) -> set:
     """Create and return aa list of edges from the topologically ordered list of alignment nodes
 
+    :param _witnessData:
     :param _toList: list of Node() objects
     :return: set of directed edges as (source, target) tuples
     """
@@ -51,10 +53,10 @@ def create_edge_list(_toList: list) -> set:
     _edgeSourceByWitness = {}  # last target will be next source
     for _node in _toList:  # token.norm is str; token.tokendata is dict with siglum:offset items
         if _node.norm == '#start':  # not an edge target, so don’t add an edge, but set up source for next edge
-            for _siglum in witnessData:
+            for _siglum in _witnessData:
                 _edgeSourceByWitness[_siglum] = _node
         elif _node.norm == '#end':  # create edges to #end for all witnesses
-            for _siglum in witnessData:
+            for _siglum in _witnessData:
                 _edgeSets[_siglum].append((_edgeSourceByWitness[_siglum], _node))
         else:
             for _key, _value in _node.tokendata.items():
@@ -196,18 +198,21 @@ def step(_df: pd.DataFrame):
     _top = max(_df["priority"])
     _current = _df[_df["priority"] == _top]
     _remainder = _df[_df["priority"] != _top]
-    return(_current, _remainder) # process current, then call again with remainder to continue
+    return _current, _remainder  # process current, then call again with remainder to continue
 
 
 def expand_dtNode(_parent: dtNode, _new_row: pd.Series, _remaining_rows: pd.DataFrame):
     """ Add children to node in decision tree
 
+    :param _new_row:
+    :param _remaining_rows:
     :param _parent: dtNode: decision tree node to be expanded
     :return: (none; expands in place)
     """
     # isolate next skipgram to process
     # _current: pd.Series = _parent.df.iloc[0, :]
     _current: pd.Series = _new_row
+    _skipgram = _current["first"] + _current["second"]
     # Identify all possible placements of skipgram
     _d = collections.defaultdict(list)
     for _i in _current.locations:
@@ -217,7 +222,7 @@ def expand_dtNode(_parent: dtNode, _new_row: pd.Series, _remaining_rows: pd.Data
     for _choice in _choices:
         _remainder = _remaining_rows.copy().sort_values(by="priority", ascending=False)
         _remainder.reset_index(inplace=True, drop=True)
-        _newChild = dtNode(copy.deepcopy(_parent.toList), copy.deepcopy(_parent.bitArray_dict),
+        _newChild = dtNode(copy.deepcopy(_parent.toList), _skipgram, copy.deepcopy(_parent.bitArray_dict),
                            _remainder)  # pop top of parent df and copy remainder to child
         _parent.children.append(_newChild)  # parents know who their children are
         for _witnessToken in _choice:
@@ -248,7 +253,8 @@ def print_alignment_table(_dtNode: dtNode, _witnessData: dict, _print_witness_of
     :return: (none)
     """
     print(create_alignment_table(_dtNode.toList, _witnessData,
-                                 rank_nodes(_dtNode.toList, create_edge_list(_dtNode.toList)), _print_witness_offset))
+                                 rank_nodes(_dtNode.toList, create_edge_list(_dtNode.toList, _witnessData)),
+                                 _print_witness_offset))
 
 
 def print_score(_dtNode: dtNode):
@@ -260,101 +266,107 @@ def print_score(_dtNode: dtNode):
     print("Score (witness tokens / toList length): ", calculate_score(_dtNode))
 
 
-def print_placed_witness_tokens(_dtNode:dtNode):
-    _ba_tmp = bitarray("".join([value.to01() for key, value in _dtNode.bitArray_dict.items()]))
+def print_placed_witness_tokens(_dtNode: dtNode):
+    _ba_tmp = bitarray("".join([_value.to01() for _, _value in _dtNode.bitArray_dict.items()]))
     return _ba_tmp.count() / _ba_tmp.length()  # percent of bits set
 
 
-# sample data with a bit of repetition
-witnessData = {'wit1': ['a', 'b', 'c', 'a', 'd', 'e'],
-               'wit2': ['a', 'e', 'c', 'd'],
-               'wit3': ['a', 'd', 'b']}
+if __name__ == "__main__":
+    # sample data with a bit of repetition
+    witnessData = {'wit1': ['a', 'b', 'c', 'a', 'd', 'e'],
+                   'wit2': ['a', 'e', 'c', 'd'],
+                   'wit3': ['a', 'd', 'b']}
 
-# fake stoplist, to ensure that we can identify stopwords and process them last
-stoplist = {'a', 'c'}  # set
+    # fake stoplist, to ensure that we can identify stopwords and process them last
+    stoplist = {'a', 'c'}  # set
 
-# bitArray_dict is used to keep track of which witness tokens have already been processed
-bitArray_dict = {k: bitarray(len(witnessData[k])) for k in witnessData}  # create a bitarray the length of each witness
-for ba in bitArray_dict.values():  # initialize bitarrays to all 0 values
-    ba.setall(0)
+    # bitArray_dict is used to keep track of which witness tokens have already been processed
+    bitArray_dict = {k: bitarray(len(witnessData[k])) for k in
+                     witnessData}  # create a bitarray the length of each witness
+    for ba in bitArray_dict.values():  # initialize bitarrays to all 0 values
+        ba.setall(0)
 
-# csTable: dictionary, in which
-#   key: two-item tuple representing skipgram normalized token values (token[0], token[1])
-#   value: list of three-item tuples records all locations where the key occurs: (siglum, offset[0], offset[1])
-#     In Real Life:
-#       values will include the t values corresponding to the normalized token values
-#       use a named tuple or dataclass (https://realpython.com/python-data-classes/)
-# In this test sample, we find all skip bigrams; in Real Life we would specify parameters for:
-#   size of skipgram (bi, tri-, etc.; here bi-)
-#   size of window (maximum distance between first and last members of skipgram; here the full witness length)
-#   maximum size of skip between members of skipgram (here constrained only by size of window)
-csTable = collections.defaultdict(list)
-for key, value in witnessData.items():  # key is siglum, value is list of normalized token readings
-    # in Real Life the value would also include a non-normalized t property
-    for first in range(len(value)):  # all first items in bigram
-        for second in range(first + 1, len(value)):  # pair with all following items
-            csTable[(value[first], value[second])].append((key, first, second))
+    # csTable: dictionary, in which
+    #   key: two-item tuple representing skipgram normalized token values (token[0], token[1])
+    #   value: list of three-item tuples records all locations where the key occurs: (siglum, offset[0], offset[1])
+    #     In Real Life:
+    #       values will include the t values corresponding to the normalized token values
+    #       use a named tuple or dataclass (https://realpython.com/python-data-classes/)
+    # In this test sample, we find all skip bigrams; in Real Life we would specify parameters for:
+    #   size of skipgram (bi, tri-, etc.; here bi-)
+    #   size of window (maximum distance between first and last members of skipgram; here the full witness length)
+    #   maximum size of skip between members of skipgram (here constrained only by size of window)
+    csTable = collections.defaultdict(list)
+    for key, value in witnessData.items():  # key is siglum, value is list of normalized token readings
+        # in Real Life the value would also include a non-normalized t property
+        for first in range(len(value)):  # all first items in bigram
+            for second in range(first + 1, len(value)):  # pair with all following items
+                csTable[(value[first], value[second])].append((key, first, second))
 
-# convert to series before df since list lengths vary
-csSeries = pd.Series(csTable)
+    # convert to series before df since list lengths vary
+    csSeries = pd.Series(csTable)
 
-# convert series to dataframe, flatten MultiIndex, label columns
-csDf = pd.DataFrame(csSeries).reset_index()
-csDf.columns = ["first", "second", "locations"]
+    # convert series to dataframe, flatten MultiIndex, label columns
+    csDf = pd.DataFrame(csSeries).reset_index()
+    csDf.columns = ["first", "second", "locations"]
 
-# count witnesses for each skipgram (depth of block) and check for uniqueness of skipgram in all witnesses
-#   extract sigla inside set comprehension to remove duplicates, then count
-csDf["local_witnesses"] = csDf["locations"].map(lambda x: [location[0] for location in x])
-csDf["unique_witnesses"] = csDf["local_witnesses"].map(lambda x: set(x))
-csDf["local_witnessCount"] = csDf["local_witnesses"].str.len()
-csDf["unique_witnessCount"] = csDf["unique_witnesses"].str.len()
-csDf["witness_uniqueness"] = csDf["local_witnessCount"] == csDf["unique_witnessCount"]
-scale = pd.Series([100, -1, 10])
-csDf["priority"] = pd.np.dot(csDf[["unique_witnessCount", "witness_uniqueness", "local_witnessCount"]], scale)
+    # count witnesses for each skipgram (depth of block) and check for uniqueness of skipgram in all witnesses
+    #   extract sigla inside set comprehension to remove duplicates, then count
+    csDf["local_witnesses"] = csDf["locations"].map(lambda x: [location[0] for location in x])
+    csDf["unique_witnesses"] = csDf["local_witnesses"].map(lambda x: set(x))
+    csDf["local_witnessCount"] = csDf["local_witnesses"].str.len()
+    csDf["unique_witnessCount"] = csDf["unique_witnesses"].str.len()
+    csDf["witness_uniqueness"] = csDf["local_witnessCount"] == csDf["unique_witnessCount"]
+    scale = pd.Series([100, -1, 10])
+    csDf["priority"] = pd.np.dot(csDf[["unique_witnessCount", "witness_uniqueness", "local_witnessCount"]], scale)
 
-# are both tokens are stopwords? (if so, we’ll process them last)
-csDf["stopwords"] = csDf[["first", "second"]].T.isin(stoplist).all()
+    # are both tokens are stopwords? (if so, we’ll process them last)
+    csDf["stopwords"] = csDf[["first", "second"]].T.isin(stoplist).all()
 
-# sort and update row numbers, so that we can traverse the skipgrams as follows
-#   (not currently using stopword list to filter)
-#   1. Words that don’t repeat within a witness first
-#   2. Within that, deepest block (most witnesses) first
-#   3. within that, rarest skipgrams first (less repetition is easier to place correctly)
-csDf.sort_values(by=["unique_witnessCount", "witness_uniqueness", "local_witnessCount"], ascending=[False, False, True],
-                 inplace=True)
-csDf.reset_index(inplace=True, drop=True)  # update row numbers
+    # sort and update row numbers, so that we can traverse the skipgrams as follows
+    #   (not currently using stopword list to filter)
+    #   1. Words that don’t repeat within a witness first
+    #   2. Within that, deepest block (most witnesses) first
+    #   3. within that, rarest skipgrams first (less repetition is easier to place correctly)
+    csDf.sort_values(by=["unique_witnessCount", "witness_uniqueness", "local_witnessCount"],
+                     ascending=[False, False, True],
+                     inplace=True)
+    csDf.reset_index(inplace=True, drop=True)  # update row numbers
 
-# root of decision tree inherits empty toList, bitArray_dict with 0 values, and complete, sorted df
-dtRoot = dtNode([Node("#start"), Node("#end")], bitArray_dict, csDf)
+    # root of decision tree inherits empty toList, bitArray_dict with 0 values, and complete, sorted df
+    dtRoot = dtNode([Node("#start"), Node("#end")], "[none]", bitArray_dict, csDf)
 
-# process root
-parent: dtNode = dtRoot # node to expand
-current, remainder = step(csDf) # current is rows to add, remainder is ... well ... what’s left
-for i in range(len(current)):
-    expand_dtNode(parent, current.iloc[i, :], pd.concat([current.drop(i, axis=0), remainder]))  # expands in place, adds children
-    print(parent)
-for child in parent.children:
-    print("\nOne level down")
-    print_alignment_table(child, witnessData, True)  # before expanding
-    print(child)
-    print_score(child)
-    print("Percentage of witness tokens placed:", print_placed_witness_tokens(child))
-    current_c, remainder_c = step(child.df)
-    for j in range(len(current_c)):
-        expand_dtNode(child, current_c.iloc[j, :], pd.concat([current_c.drop(j, axis=0), remainder_c]))
-        for grandchild in child.children:
-            print("\nTwo levels down")
-            print_alignment_table(grandchild, witnessData, True)  # before expanding
-            print(grandchild)
-            print_score(grandchild)
-            print("Percentage of witness tokens placed:", print_placed_witness_tokens(grandchild))
-            current_d, remainder_d = step(grandchild.df)
-            for k in range(len(current_d)):
-                expand_dtNode(grandchild, current_d.iloc[k, :], pd.concat([current_d.drop(k, axis=0), remainder_d]))
-                for greatgrandchild in grandchild.children:
-                    print("\nThree levels down")
-                    print_alignment_table(greatgrandchild, witnessData, True)
-                    print(greatgrandchild)
-                    print_score(greatgrandchild)
-                    print("Percentage of witness tokens placed:", print_placed_witness_tokens(greatgrandchild))
-
+    # process root
+    parent: dtNode = dtRoot  # node to expand
+    current, remainder = step(csDf)  # current is rows to add, remainder is ... well ... what’s left
+    for i in range(len(current)):
+        expand_dtNode(parent, current.iloc[i, :],
+                      pd.concat([current.drop(i, axis=0), remainder]))  # expands in place, adds children
+        print(parent)
+    for child in parent.children:
+        print("\nOne level down")
+        print_alignment_table(child, witnessData, True)  # before expanding
+        print(child)
+        print_score(child)
+        print("Placed skipgram:", child.skipgram)
+        print("Percentage of witness tokens placed:", print_placed_witness_tokens(child))
+        current_c, remainder_c = step(child.df)
+        for j in range(len(current_c)):
+            expand_dtNode(child, current_c.iloc[j, :], pd.concat([current_c.drop(j, axis=0), remainder_c]))
+            for grandchild in child.children:
+                print("\nTwo levels down")
+                print_alignment_table(grandchild, witnessData, True)  # before expanding
+                print(grandchild)
+                print_score(grandchild)
+                print("Placed skipgram:", grandchild.skipgram)
+                print("Percentage of witness tokens placed:", print_placed_witness_tokens(grandchild))
+                current_d, remainder_d = step(grandchild.df)
+                for k in range(len(current_d)):
+                    expand_dtNode(grandchild, current_d.iloc[k, :], pd.concat([current_d.drop(k, axis=0), remainder_d]))
+                    for greatgrandchild in grandchild.children:
+                        print("\nThree levels down")
+                        print_alignment_table(greatgrandchild, witnessData, True)
+                        print(greatgrandchild)
+                        print_score(greatgrandchild)
+                        print("Placed skipgram:", greatgrandchild.skipgram)
+                        print("Percentage of witness tokens placed:", print_placed_witness_tokens(greatgrandchild))
