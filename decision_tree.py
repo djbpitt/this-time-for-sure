@@ -248,7 +248,7 @@ def print_alignment_table(_dtNode: dtNode, _witnessData: dict, _print_witness_of
     """ Print alignment table for decision tree node
 
     :param _dtNode: dtNode: node to print
-    :param _witnessData: dict: witness token input  
+    :param _witnessData: dict: witness token input
     :param _print_witness_offset: bool: print offset of token in witness?
     :return: (none)
     """
