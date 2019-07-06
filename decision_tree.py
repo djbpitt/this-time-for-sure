@@ -218,7 +218,7 @@ def expand_dtNode(_parent: dtNode, _new_row: pd.Series, _remaining_rows: pd.Data
     for _i in _current.locations:
         _d[_i[0]].append(_i)
     _choices: list = list(itertools.product(*_d.values()))
-    print("\nThere are", len(_choices), "choices at this level")
+    # print("\nThere are", len(_choices), "choices at this level")
     for _choice in _choices:
         _remainder = _remaining_rows.copy().sort_values(by="priority", ascending=False)
         _remainder.reset_index(inplace=True, drop=True)
