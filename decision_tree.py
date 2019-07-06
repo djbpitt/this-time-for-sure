@@ -96,11 +96,13 @@ def create_alignment_table(_toList: list, _witnessData: dict, _nodesByRank: pd.D
     """
     _nodesByRank = collections.defaultdict(list)
     for _node in _toList:
+        # print("Node:", _node)
         _nodesByRank[_node.rank].append(_node)
     _table = PrettyTable(header=False)
     _orderedSigla = sorted(_witnessData.keys())
     _table.add_column(None, [_key for _key in _orderedSigla])
     for _rank, _nodes in _nodesByRank.items():  # add a column for each rank
+        # print("Rank:", _rank, "; nodes", _nodes)
         _columnTokens = {}
         for _node in _nodes:  # copy tokens from all nodes at rank into a single dictionary; value is string (not
             # offset)
@@ -342,6 +344,7 @@ if __name__ == "__main__":
     for i in range(len(current)):
         expand_dtNode(parent, current.iloc[i, :],
                       pd.concat([current.drop(i, axis=0), remainder]))  # expands in place, adds children
+        print_alignment_table(parent, witnessData, True)
         print(parent)
     for child in parent.children:
         print("\nOne level down")

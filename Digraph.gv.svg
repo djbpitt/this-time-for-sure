@@ -15,11 +15,11 @@
 <ellipse fill="none" stroke="#000000" cx="130.8148" cy="-999.2046" rx="130.6298" ry="50.41"/>
 <text text-anchor="middle" x="130.8148" y="-1024.3046" font-family="Courier,monospace" font-size="8.00" fill="#000000">Placed witness tokens (pct): 0.00</text>
 <text text-anchor="middle" x="130.8148" y="-1015.3046" font-family="Courier,monospace" font-size="8.00" fill="#000000">Score (tokens / toList length): N/A</text>
-<text text-anchor="middle" x="130.8148" y="-1006.3046" font-family="Courier,monospace" font-size="8.00" fill="#000000">+&#45;&#45;&#45;&#45;&#45;&#45;+&#45;&#45;&#45;&#45;&#45;&#45;+</text>
-<text text-anchor="middle" x="130.8148" y="-997.3046" font-family="Courier,monospace" font-size="8.00" fill="#000000">| wit1 | #end |</text>
-<text text-anchor="middle" x="130.8148" y="-988.3046" font-family="Courier,monospace" font-size="8.00" fill="#000000">| wit2 | #end |</text>
-<text text-anchor="middle" x="130.8148" y="-979.3046" font-family="Courier,monospace" font-size="8.00" fill="#000000">| wit3 | #end |</text>
-<text text-anchor="middle" x="130.8148" y="-970.3046" font-family="Courier,monospace" font-size="8.00" fill="#000000">+&#45;&#45;&#45;&#45;&#45;&#45;+&#45;&#45;&#45;&#45;&#45;&#45;+</text>
+<text text-anchor="middle" x="130.8148" y="-1006.3046" font-family="Courier,monospace" font-size="8.00" fill="#000000">+&#45;&#45;&#45;&#45;&#45;&#45;+&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;+&#45;&#45;&#45;&#45;&#45;&#45;+</text>
+<text text-anchor="middle" x="130.8148" y="-997.3046" font-family="Courier,monospace" font-size="8.00" fill="#000000">| wit1 | #start | #end |</text>
+<text text-anchor="middle" x="130.8148" y="-988.3046" font-family="Courier,monospace" font-size="8.00" fill="#000000">| wit2 | #start | #end |</text>
+<text text-anchor="middle" x="130.8148" y="-979.3046" font-family="Courier,monospace" font-size="8.00" fill="#000000">| wit3 | #start | #end |</text>
+<text text-anchor="middle" x="130.8148" y="-970.3046" font-family="Courier,monospace" font-size="8.00" fill="#000000">+&#45;&#45;&#45;&#45;&#45;&#45;+&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;+&#45;&#45;&#45;&#45;&#45;&#45;+</text>
 </g>
 <!-- 2 -->
 <g id="node2" class="node">
