@@ -1,13 +1,20 @@
 digraph {
+<<<<<<< HEAD
 	graph [rankdir=LR]
 	node [fontname=Courier fontsize=8]
 	1 [label="Placed witness tokens (pct): 0.00
 Score (tokens / toList length): N/A
+=======
+	node [fontname=Courier]
+	node [fontsize=7]
+	1 [label="[none]
+>>>>>>> parent of 6eb8d39... add score and placed token pct to svg
 +------+------+
 | wit1 | #end |
 | wit2 | #end |
 | wit3 | #end |
 +------+------+" c=1]
+<<<<<<< HEAD
 	2 [label="Placed witness tokens (pct): 0.46
 Score (tokens / toList length): 3.00
 +------+--------+------+------+------+
@@ -264,4 +271,132 @@ Score (tokens / toList length): 1.80
 | wit3 | #start |      |      | a(0) |      | d(1) | #end |
 +------+--------+------+------+------+------+------+------+" c=33]
 	31 -> 33 [label=ac]
+=======
+	2 [label="ad
++------+--------+---+---+------+
+| wit1 | #start | a | d | #end |
+| wit2 | #start | a | d | #end |
+| wit3 | #start | a | d | #end |
++------+--------+---+---+------+" c=2]
+	1 -> 2 [label=ad]
+	3 [label="ae
++------+--------+---+---+---+---+------+
+| wit1 | #start | a |   | d | e | #end |
+| wit2 | #start | a | e | d |   | #end |
+| wit3 | #start | a |   | d |   | #end |
++------+--------+---+---+---+---+------+" c=3]
+	2 -> 3 [label=ae]
+	4 [label="ab
++------+--------+---+---+---+---+------+
+| wit1 | #start | a | b | d | e | #end |
+| wit2 | #start | a | e | d |   | #end |
+| wit3 | #start | a |   | d | b | #end |
++------+--------+---+---+---+---+------+" c=4]
+	3 -> 4 [label=ab]
+	5 [label="ac
++------+--------+---+---+---+---+---+------+
+| wit1 | #start | a |   | c | d | e | #end |
+| wit2 | #start | a | e | c | d |   | #end |
+| wit3 | #start | a |   |   | d |   | #end |
++------+--------+---+---+---+---+---+------+" c=5]
+	3 -> 5 [label=ac]
+	6 [label="cd
++------+--------+---+---+---+---+---+------+
+| wit1 | #start | a |   | c | d | e | #end |
+| wit2 | #start | a | e | c | d |   | #end |
+| wit3 | #start | a |   |   | d |   | #end |
++------+--------+---+---+---+---+---+------+" c=6]
+	3 -> 6 [label=cd]
+	7 [label="ae
++------+--------+---+---+---+---+------+
+| wit1 | #start | a | a | d | e | #end |
+| wit2 | #start | a | e | d |   | #end |
+| wit3 | #start | a |   | d |   | #end |
++------+--------+---+---+---+---+------+" c=7]
+	2 -> 7 [label=ae]
+	8 [label="ab
++------+--------+---+---+---+---+---+------+
+| wit1 | #start | a | b | a | d | e | #end |
+| wit2 | #start | a | e |   | d |   | #end |
+| wit3 | #start | a |   |   | d | b | #end |
++------+--------+---+---+---+---+---+------+" c=8]
+	7 -> 8 [label=ab]
+	9 [label="ac
++------+--------+---+---+---+---+---+------+
+| wit1 | #start | a | c | a | d | e | #end |
+| wit2 | #start | a | e | c | d |   | #end |
+| wit3 | #start | a |   |   | d |   | #end |
++------+--------+---+---+---+---+---+------+" c=9]
+	7 -> 9 [label=ac]
+	10 [label="cd
++------+--------+---+---+---+---+---+------+
+| wit1 | #start | a | c | a | d | e | #end |
+| wit2 | #start | a | e | c | d |   | #end |
+| wit3 | #start | a |   |   | d |   | #end |
++------+--------+---+---+---+---+---+------+" c=10]
+	7 -> 10 [label=cd]
+	11 [label="ad
++------+--------+---+---+------+
+| wit1 | #start | a | d | #end |
+| wit2 | #start | a | d | #end |
+| wit3 | #start | a | d | #end |
++------+--------+---+---+------+" c=11]
+	1 -> 11 [label=ad]
+	12 [label="ae
++------+--------+---+---+---+---+---+------+
+| wit1 | #start | a | a |   | d | e | #end |
+| wit2 | #start |   | a | e | d |   | #end |
+| wit3 | #start |   | a |   | d |   | #end |
++------+--------+---+---+---+---+---+------+" c=12]
+	11 -> 12 [label=ae]
+	13 [label="ab
++------+--------+---+---+---+---+---+---+------+
+| wit1 | #start | a | b | a |   | d | e | #end |
+| wit2 | #start |   |   | a | e | d |   | #end |
+| wit3 | #start |   |   | a |   | d | b | #end |
++------+--------+---+---+---+---+---+---+------+" c=13]
+	12 -> 13 [label=ab]
+	14 [label="ac
++------+--------+---+---+---+---+---+---+---+------+
+| wit1 | #start | a | c | a |   |   | d | e | #end |
+| wit2 | #start |   |   | a | e | c | d |   | #end |
+| wit3 | #start |   |   | a |   |   | d |   | #end |
++------+--------+---+---+---+---+---+---+---+------+" c=14]
+	12 -> 14 [label=ac]
+	15 [label="cd
++------+--------+---+---+---+---+---+---+---+------+
+| wit1 | #start | a | c | a |   |   | d | e | #end |
+| wit2 | #start |   |   | a | e | c | d |   | #end |
+| wit3 | #start |   |   | a |   |   | d |   | #end |
++------+--------+---+---+---+---+---+---+---+------+" c=15]
+	12 -> 15 [label=cd]
+	16 [label="ae
++------+--------+---+---+---+---+------+
+| wit1 | #start | a |   | d | e | #end |
+| wit2 | #start | a | e | d |   | #end |
+| wit3 | #start | a |   | d |   | #end |
++------+--------+---+---+---+---+------+" c=16]
+	11 -> 16 [label=ae]
+	17 [label="ab
++------+--------+---+---+---+---+---+---+------+
+| wit1 | #start | a | b | a |   | d | e | #end |
+| wit2 | #start |   |   | a | e | d |   | #end |
+| wit3 | #start |   |   | a |   | d | b | #end |
++------+--------+---+---+---+---+---+---+------+" c=17]
+	16 -> 17 [label=ab]
+	18 [label="ac
++------+--------+---+---+---+---+---+---+---+------+
+| wit1 | #start | a | c | a |   |   | d | e | #end |
+| wit2 | #start |   |   | a | e | c | d |   | #end |
+| wit3 | #start |   |   | a |   |   | d |   | #end |
++------+--------+---+---+---+---+---+---+---+------+" c=18]
+	16 -> 18 [label=ac]
+	19 [label="cd
++------+--------+---+---+---+---+---+---+------+
+| wit1 | #start | c | a |   |   | d | e | #end |
+| wit2 | #start |   | a | e | c | d |   | #end |
+| wit3 | #start |   | a |   |   | d |   | #end |
++------+--------+---+---+---+---+---+---+------+" c=19]
+	16 -> 19 [label=cd]
+>>>>>>> parent of 6eb8d39... add score and placed token pct to svg
 }
