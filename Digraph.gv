@@ -40,30 +40,30 @@ Score (tokens / toList length): 2.00
 | wit3 | #start | a(0) |      |      | d(1) | b(2) | #end |
 +------+--------+------+------+------+------+------+------+"]
 	4 -> 5 [label=cd]
-	6 [label="Placed witness tokens (pct): 0.77
+	6 [label="Placed witness tokens (pct): 0.92
+Score (tokens / toList length): 1.71
++------+--------+------+------+------+------+------+------+
+| wit1 | #start | a(0) | b(1) | c(2) | d(4) | e(5) | #end |
+| wit2 | #start | a(0) | e(1) | c(2) | d(3) |      | #end |
+| wit3 | #start | a(0) |      |      | d(1) | b(2) | #end |
++------+--------+------+------+------+------+------+------+"]
+	5 -> 6 [label=ae]
+	7 [label="Placed witness tokens (pct): 1.00
+Score (tokens / toList length): 1.62
++------+--------+------+------+------+------+------+------+------+
+| wit1 | #start | a(0) | b(1) | c(2) | a(3) | d(4) | e(5) | #end |
+| wit2 | #start | a(0) | e(1) | c(2) |      | d(3) |      | #end |
+| wit3 | #start | a(0) |      |      |      | d(1) | b(2) | #end |
++------+--------+------+------+------+------+------+------+------+"]
+	5 -> 7 [label=ae]
+	8 [label="Placed witness tokens (pct): 0.77
 Score (tokens / toList length): 2.00
 +------+--------+------+------+------+------+------+------+
 | wit1 | #start | a(0) | b(1) | c(2) | d(4) |      | #end |
 | wit2 | #start | a(0) |      | c(2) | d(3) |      | #end |
 | wit3 | #start | a(0) |      |      | d(1) | b(2) | #end |
 +------+--------+------+------+------+------+------+------+"]
-	3 -> 6 [label=cd]
-	7 [label="Placed witness tokens (pct): 0.77
-Score (tokens / toList length): 2.00
-+------+--------+------+------+------+------+------+------+
-| wit1 | #start | a(0) | b(1) | c(2) | d(4) |      | #end |
-| wit2 | #start | a(0) |      | c(2) | d(3) |      | #end |
-| wit3 | #start | a(0) |      |      | d(1) | b(2) | #end |
-+------+--------+------+------+------+------+------+------+"]
-	6 -> 7 [label=ac]
-	8 [label="Placed witness tokens (pct): 0.62
-Score (tokens / toList length): 2.67
-+------+--------+------+------+------+------+
-| wit1 | #start | a(0) | c(2) | d(4) | #end |
-| wit2 | #start | a(0) | c(2) | d(3) | #end |
-| wit3 | #start | a(0) |      | d(1) | #end |
-+------+--------+------+------+------+------+"]
-	2 -> 8 [label=ac]
+	3 -> 8 [label=cd]
 	9 [label="Placed witness tokens (pct): 0.77
 Score (tokens / toList length): 2.00
 +------+--------+------+------+------+------+------+------+
@@ -71,39 +71,39 @@ Score (tokens / toList length): 2.00
 | wit2 | #start | a(0) |      | c(2) | d(3) |      | #end |
 | wit3 | #start | a(0) |      |      | d(1) | b(2) | #end |
 +------+--------+------+------+------+------+------+------+"]
-	8 -> 9 [label=ab]
-	10 [label="Placed witness tokens (pct): 0.77
-Score (tokens / toList length): 2.00
+	8 -> 9 [label=ac]
+	10 [label="Placed witness tokens (pct): 0.92
+Score (tokens / toList length): 1.71
 +------+--------+------+------+------+------+------+------+
-| wit1 | #start | a(0) | b(1) | c(2) | d(4) |      | #end |
-| wit2 | #start | a(0) |      | c(2) | d(3) |      | #end |
+| wit1 | #start | a(0) | b(1) | c(2) | d(4) | e(5) | #end |
+| wit2 | #start | a(0) | e(1) | c(2) | d(3) |      | #end |
 | wit3 | #start | a(0) |      |      | d(1) | b(2) | #end |
 +------+--------+------+------+------+------+------+------+"]
-	9 -> 10 [label=cd]
-	11 [label="Placed witness tokens (pct): 0.62
+	9 -> 10 [label=ae]
+	11 [label="Placed witness tokens (pct): 1.00
+Score (tokens / toList length): 1.62
++------+--------+------+------+------+------+------+------+------+
+| wit1 | #start | a(0) | b(1) | c(2) | a(3) | d(4) | e(5) | #end |
+| wit2 | #start | a(0) | e(1) | c(2) |      | d(3) |      | #end |
+| wit3 | #start | a(0) |      |      |      | d(1) | b(2) | #end |
++------+--------+------+------+------+------+------+------+------+"]
+	9 -> 11 [label=ae]
+	12 [label="Placed witness tokens (pct): 0.62
 Score (tokens / toList length): 2.67
 +------+--------+------+------+------+------+
 | wit1 | #start | a(0) | c(2) | d(4) | #end |
 | wit2 | #start | a(0) | c(2) | d(3) | #end |
 | wit3 | #start | a(0) |      | d(1) | #end |
 +------+--------+------+------+------+------+"]
-	8 -> 11 [label=cd]
-	12 [label="Placed witness tokens (pct): 0.77
+	2 -> 12 [label=ac]
+	13 [label="Placed witness tokens (pct): 0.77
 Score (tokens / toList length): 2.00
 +------+--------+------+------+------+------+------+------+
 | wit1 | #start | a(0) | b(1) | c(2) | d(4) |      | #end |
 | wit2 | #start | a(0) |      | c(2) | d(3) |      | #end |
 | wit3 | #start | a(0) |      |      | d(1) | b(2) | #end |
 +------+--------+------+------+------+------+------+------+"]
-	11 -> 12 [label=ab]
-	13 [label="Placed witness tokens (pct): 0.62
-Score (tokens / toList length): 2.67
-+------+--------+------+------+------+------+
-| wit1 | #start | a(0) | c(2) | d(4) | #end |
-| wit2 | #start | a(0) | c(2) | d(3) | #end |
-| wit3 | #start | a(0) |      | d(1) | #end |
-+------+--------+------+------+------+------+"]
-	2 -> 13 [label=cd]
+	12 -> 13 [label=ab]
 	14 [label="Placed witness tokens (pct): 0.77
 Score (tokens / toList length): 2.00
 +------+--------+------+------+------+------+------+------+
@@ -111,151 +111,151 @@ Score (tokens / toList length): 2.00
 | wit2 | #start | a(0) |      | c(2) | d(3) |      | #end |
 | wit3 | #start | a(0) |      |      | d(1) | b(2) | #end |
 +------+--------+------+------+------+------+------+------+"]
-	13 -> 14 [label=ab]
-	15 [label="Placed witness tokens (pct): 0.77
-Score (tokens / toList length): 2.00
+	13 -> 14 [label=cd]
+	15 [label="Placed witness tokens (pct): 0.92
+Score (tokens / toList length): 1.71
 +------+--------+------+------+------+------+------+------+
-| wit1 | #start | a(0) | b(1) | c(2) | d(4) |      | #end |
-| wit2 | #start | a(0) |      | c(2) | d(3) |      | #end |
+| wit1 | #start | a(0) | b(1) | c(2) | d(4) | e(5) | #end |
+| wit2 | #start | a(0) | e(1) | c(2) | d(3) |      | #end |
 | wit3 | #start | a(0) |      |      | d(1) | b(2) | #end |
 +------+--------+------+------+------+------+------+------+"]
-	14 -> 15 [label=ac]
-	16 [label="Placed witness tokens (pct): 0.62
+	14 -> 15 [label=ae]
+	16 [label="Placed witness tokens (pct): 1.00
+Score (tokens / toList length): 1.62
++------+--------+------+------+------+------+------+------+------+
+| wit1 | #start | a(0) | b(1) | c(2) | a(3) | d(4) | e(5) | #end |
+| wit2 | #start | a(0) | e(1) | c(2) |      | d(3) |      | #end |
+| wit3 | #start | a(0) |      |      |      | d(1) | b(2) | #end |
++------+--------+------+------+------+------+------+------+------+"]
+	14 -> 16 [label=ae]
+	17 [label="Placed witness tokens (pct): 0.62
 Score (tokens / toList length): 2.67
 +------+--------+------+------+------+------+
 | wit1 | #start | a(0) | c(2) | d(4) | #end |
 | wit2 | #start | a(0) | c(2) | d(3) | #end |
 | wit3 | #start | a(0) |      | d(1) | #end |
 +------+--------+------+------+------+------+"]
-	13 -> 16 [label=ac]
-	17 [label="Placed witness tokens (pct): 0.77
+	12 -> 17 [label=cd]
+	18 [label="Placed witness tokens (pct): 0.77
 Score (tokens / toList length): 2.00
 +------+--------+------+------+------+------+------+------+
 | wit1 | #start | a(0) | b(1) | c(2) | d(4) |      | #end |
 | wit2 | #start | a(0) |      | c(2) | d(3) |      | #end |
 | wit3 | #start | a(0) |      |      | d(1) | b(2) | #end |
 +------+--------+------+------+------+------+------+------+"]
-	16 -> 17 [label=ab]
-	18 [label="Placed witness tokens (pct): 0.46
+	17 -> 18 [label=ab]
+	19 [label="Placed witness tokens (pct): 0.92
+Score (tokens / toList length): 1.71
++------+--------+------+------+------+------+------+------+
+| wit1 | #start | a(0) | b(1) | c(2) | d(4) | e(5) | #end |
+| wit2 | #start | a(0) | e(1) | c(2) | d(3) |      | #end |
+| wit3 | #start | a(0) |      |      | d(1) | b(2) | #end |
++------+--------+------+------+------+------+------+------+"]
+	18 -> 19 [label=ae]
+	20 [label="Placed witness tokens (pct): 1.00
+Score (tokens / toList length): 1.62
++------+--------+------+------+------+------+------+------+------+
+| wit1 | #start | a(0) | b(1) | c(2) | a(3) | d(4) | e(5) | #end |
+| wit2 | #start | a(0) | e(1) | c(2) |      | d(3) |      | #end |
+| wit3 | #start | a(0) |      |      |      | d(1) | b(2) | #end |
++------+--------+------+------+------+------+------+------+------+"]
+	18 -> 20 [label=ae]
+	21 [label="Placed witness tokens (pct): 0.62
+Score (tokens / toList length): 2.67
++------+--------+------+------+------+------+
+| wit1 | #start | a(0) | c(2) | d(4) | #end |
+| wit2 | #start | a(0) | c(2) | d(3) | #end |
+| wit3 | #start | a(0) |      | d(1) | #end |
++------+--------+------+------+------+------+"]
+	2 -> 21 [label=cd]
+	22 [label="Placed witness tokens (pct): 0.77
+Score (tokens / toList length): 2.00
++------+--------+------+------+------+------+------+------+
+| wit1 | #start | a(0) | b(1) | c(2) | d(4) |      | #end |
+| wit2 | #start | a(0) |      | c(2) | d(3) |      | #end |
+| wit3 | #start | a(0) |      |      | d(1) | b(2) | #end |
++------+--------+------+------+------+------+------+------+"]
+	21 -> 22 [label=ab]
+	23 [label="Placed witness tokens (pct): 0.77
+Score (tokens / toList length): 2.00
++------+--------+------+------+------+------+------+------+
+| wit1 | #start | a(0) | b(1) | c(2) | d(4) |      | #end |
+| wit2 | #start | a(0) |      | c(2) | d(3) |      | #end |
+| wit3 | #start | a(0) |      |      | d(1) | b(2) | #end |
++------+--------+------+------+------+------+------+------+"]
+	22 -> 23 [label=ac]
+	24 [label="Placed witness tokens (pct): 0.92
+Score (tokens / toList length): 1.71
++------+--------+------+------+------+------+------+------+
+| wit1 | #start | a(0) | b(1) | c(2) | d(4) | e(5) | #end |
+| wit2 | #start | a(0) | e(1) | c(2) | d(3) |      | #end |
+| wit3 | #start | a(0) |      |      | d(1) | b(2) | #end |
++------+--------+------+------+------+------+------+------+"]
+	23 -> 24 [label=ae]
+	25 [label="Placed witness tokens (pct): 1.00
+Score (tokens / toList length): 1.62
++------+--------+------+------+------+------+------+------+------+
+| wit1 | #start | a(0) | b(1) | c(2) | a(3) | d(4) | e(5) | #end |
+| wit2 | #start | a(0) | e(1) | c(2) |      | d(3) |      | #end |
+| wit3 | #start | a(0) |      |      |      | d(1) | b(2) | #end |
++------+--------+------+------+------+------+------+------+------+"]
+	23 -> 25 [label=ae]
+	26 [label="Placed witness tokens (pct): 0.62
+Score (tokens / toList length): 2.67
++------+--------+------+------+------+------+
+| wit1 | #start | a(0) | c(2) | d(4) | #end |
+| wit2 | #start | a(0) | c(2) | d(3) | #end |
+| wit3 | #start | a(0) |      | d(1) | #end |
++------+--------+------+------+------+------+"]
+	21 -> 26 [label=ac]
+	27 [label="Placed witness tokens (pct): 0.77
+Score (tokens / toList length): 2.00
++------+--------+------+------+------+------+------+------+
+| wit1 | #start | a(0) | b(1) | c(2) | d(4) |      | #end |
+| wit2 | #start | a(0) |      | c(2) | d(3) |      | #end |
+| wit3 | #start | a(0) |      |      | d(1) | b(2) | #end |
++------+--------+------+------+------+------+------+------+"]
+	26 -> 27 [label=ab]
+	28 [label="Placed witness tokens (pct): 0.92
+Score (tokens / toList length): 1.71
++------+--------+------+------+------+------+------+------+
+| wit1 | #start | a(0) | b(1) | c(2) | d(4) | e(5) | #end |
+| wit2 | #start | a(0) | e(1) | c(2) | d(3) |      | #end |
+| wit3 | #start | a(0) |      |      | d(1) | b(2) | #end |
++------+--------+------+------+------+------+------+------+"]
+	27 -> 28 [label=ae]
+	29 [label="Placed witness tokens (pct): 1.00
+Score (tokens / toList length): 1.62
++------+--------+------+------+------+------+------+------+------+
+| wit1 | #start | a(0) | b(1) | c(2) | a(3) | d(4) | e(5) | #end |
+| wit2 | #start | a(0) | e(1) | c(2) |      | d(3) |      | #end |
+| wit3 | #start | a(0) |      |      |      | d(1) | b(2) | #end |
++------+--------+------+------+------+------+------+------+------+"]
+	27 -> 29 [label=ae]
+	30 [label="Placed witness tokens (pct): 0.46
 Score (tokens / toList length): 3.00
 +------+--------+------+------+------+
 | wit1 | #start | a(3) | d(4) | #end |
 | wit2 | #start | a(0) | d(3) | #end |
 | wit3 | #start | a(0) | d(1) | #end |
 +------+--------+------+------+------+"]
-	1 -> 18 [label=ad]
-	19 [label="Placed witness tokens (pct): 0.69
+	1 -> 30 [label=ad]
+	31 [label="Placed witness tokens (pct): 0.69
 Score (tokens / toList length): 1.80
 +------+--------+------+------+------+------+------+------+
 | wit1 | #start | a(0) | b(1) | a(3) | d(4) |      | #end |
 | wit2 | #start |      |      | a(0) | d(3) |      | #end |
 | wit3 | #start |      |      | a(0) | d(1) | b(2) | #end |
 +------+--------+------+------+------+------+------+------+"]
-	18 -> 19 [label=ab]
-	20 [label="Placed witness tokens (pct): 0.85
+	30 -> 31 [label=ab]
+	32 [label="Placed witness tokens (pct): 0.85
 Score (tokens / toList length): 1.57
 +------+--------+------+------+------+------+------+------+------+------+
 | wit1 | #start | a(0) | b(1) | c(2) | a(3) |      | d(4) |      | #end |
 | wit2 | #start |      |      |      | a(0) | c(2) | d(3) |      | #end |
 | wit3 | #start |      |      |      | a(0) |      | d(1) | b(2) | #end |
 +------+--------+------+------+------+------+------+------+------+------+"]
-	19 -> 20 [label=ac]
-	21 [label="Placed witness tokens (pct): 0.85
-Score (tokens / toList length): 1.57
-+------+--------+------+------+------+------+------+------+------+------+
-| wit1 | #start | a(0) | b(1) | c(2) | a(3) |      | d(4) |      | #end |
-| wit2 | #start |      |      |      | a(0) | c(2) | d(3) |      | #end |
-| wit3 | #start |      |      |      | a(0) |      | d(1) | b(2) | #end |
-+------+--------+------+------+------+------+------+------+------+------+"]
-	20 -> 21 [label=cd]
-	22 [label="Placed witness tokens (pct): 0.85
-Score (tokens / toList length): 1.57
-+------+--------+------+------+------+------+------+------+------+------+
-| wit1 | #start | a(0) | b(1) | c(2) | a(3) |      | d(4) |      | #end |
-| wit2 | #start |      |      |      | a(0) | c(2) | d(3) |      | #end |
-| wit3 | #start |      |      |      | a(0) |      | d(1) | b(2) | #end |
-+------+--------+------+------+------+------+------+------+------+------+"]
-	19 -> 22 [label=cd]
-	23 [label="Placed witness tokens (pct): 0.85
-Score (tokens / toList length): 1.57
-+------+--------+------+------+------+------+------+------+------+------+
-| wit1 | #start | a(0) | b(1) | c(2) | a(3) |      | d(4) |      | #end |
-| wit2 | #start |      |      |      | a(0) | c(2) | d(3) |      | #end |
-| wit3 | #start |      |      |      | a(0) |      | d(1) | b(2) | #end |
-+------+--------+------+------+------+------+------+------+------+------+"]
-	22 -> 23 [label=ac]
-	24 [label="Placed witness tokens (pct): 0.69
-Score (tokens / toList length): 1.80
-+------+--------+------+------+------+------+------+------+
-| wit1 | #start | a(0) | c(2) | a(3) |      | d(4) | #end |
-| wit2 | #start |      |      | a(0) | c(2) | d(3) | #end |
-| wit3 | #start |      |      | a(0) |      | d(1) | #end |
-+------+--------+------+------+------+------+------+------+"]
-	18 -> 24 [label=ac]
-	25 [label="Placed witness tokens (pct): 0.85
-Score (tokens / toList length): 1.57
-+------+--------+------+------+------+------+------+------+------+------+
-| wit1 | #start | a(0) | b(1) | c(2) | a(3) |      | d(4) |      | #end |
-| wit2 | #start |      |      |      | a(0) | c(2) | d(3) |      | #end |
-| wit3 | #start |      |      |      | a(0) |      | d(1) | b(2) | #end |
-+------+--------+------+------+------+------+------+------+------+------+"]
-	24 -> 25 [label=ab]
-	26 [label="Placed witness tokens (pct): 0.85
-Score (tokens / toList length): 1.57
-+------+--------+------+------+------+------+------+------+------+------+
-| wit1 | #start | a(0) | b(1) | c(2) | a(3) |      | d(4) |      | #end |
-| wit2 | #start |      |      |      | a(0) | c(2) | d(3) |      | #end |
-| wit3 | #start |      |      |      | a(0) |      | d(1) | b(2) | #end |
-+------+--------+------+------+------+------+------+------+------+------+"]
-	25 -> 26 [label=cd]
-	27 [label="Placed witness tokens (pct): 0.69
-Score (tokens / toList length): 1.80
-+------+--------+------+------+------+------+------+------+
-| wit1 | #start | a(0) | c(2) | a(3) |      | d(4) | #end |
-| wit2 | #start |      |      | a(0) | c(2) | d(3) | #end |
-| wit3 | #start |      |      | a(0) |      | d(1) | #end |
-+------+--------+------+------+------+------+------+------+"]
-	24 -> 27 [label=cd]
-	28 [label="Placed witness tokens (pct): 0.85
-Score (tokens / toList length): 1.57
-+------+--------+------+------+------+------+------+------+------+------+
-| wit1 | #start | a(0) | b(1) | c(2) | a(3) |      | d(4) |      | #end |
-| wit2 | #start |      |      |      | a(0) | c(2) | d(3) |      | #end |
-| wit3 | #start |      |      |      | a(0) |      | d(1) | b(2) | #end |
-+------+--------+------+------+------+------+------+------+------+------+"]
-	27 -> 28 [label=ab]
-	29 [label="Placed witness tokens (pct): 0.62
-Score (tokens / toList length): 2.00
-+------+--------+------+------+------+------+------+
-| wit1 | #start | c(2) | a(3) |      | d(4) | #end |
-| wit2 | #start |      | a(0) | c(2) | d(3) | #end |
-| wit3 | #start |      | a(0) |      | d(1) | #end |
-+------+--------+------+------+------+------+------+"]
-	18 -> 29 [label=cd]
-	30 [label="Placed witness tokens (pct): 0.85
-Score (tokens / toList length): 1.57
-+------+--------+------+------+------+------+------+------+------+------+
-| wit1 | #start | a(0) | b(1) | c(2) | a(3) |      | d(4) |      | #end |
-| wit2 | #start |      |      |      | a(0) | c(2) | d(3) |      | #end |
-| wit3 | #start |      |      |      | a(0) |      | d(1) | b(2) | #end |
-+------+--------+------+------+------+------+------+------+------+------+"]
-	29 -> 30 [label=ab]
-	31 [label="Placed witness tokens (pct): 0.85
-Score (tokens / toList length): 1.57
-+------+--------+------+------+------+------+------+------+------+------+
-| wit1 | #start | a(0) | b(1) | c(2) | a(3) |      | d(4) |      | #end |
-| wit2 | #start |      |      |      | a(0) | c(2) | d(3) |      | #end |
-| wit3 | #start |      |      |      | a(0) |      | d(1) | b(2) | #end |
-+------+--------+------+------+------+------+------+------+------+------+"]
-	30 -> 31 [label=ac]
-	32 [label="Placed witness tokens (pct): 0.69
-Score (tokens / toList length): 1.80
-+------+--------+------+------+------+------+------+------+
-| wit1 | #start | a(0) | c(2) | a(3) |      | d(4) | #end |
-| wit2 | #start |      |      | a(0) | c(2) | d(3) | #end |
-| wit3 | #start |      |      | a(0) |      | d(1) | #end |
-+------+--------+------+------+------+------+------+------+"]
-	29 -> 32 [label=ac]
+	31 -> 32 [label=ac]
 	33 [label="Placed witness tokens (pct): 0.85
 Score (tokens / toList length): 1.57
 +------+--------+------+------+------+------+------+------+------+------+
@@ -263,5 +263,197 @@ Score (tokens / toList length): 1.57
 | wit2 | #start |      |      |      | a(0) | c(2) | d(3) |      | #end |
 | wit3 | #start |      |      |      | a(0) |      | d(1) | b(2) | #end |
 +------+--------+------+------+------+------+------+------+------+------+"]
-	32 -> 33 [label=ab]
+	32 -> 33 [label=cd]
+	34 [label="Placed witness tokens (pct): 1.00
+Score (tokens / toList length): 1.44
++------+--------+------+------+------+------+------+------+------+------+------+
+| wit1 | #start | a(0) | b(1) | c(2) | a(3) |      |      | d(4) | e(5) | #end |
+| wit2 | #start |      |      |      | a(0) | e(1) | c(2) | d(3) |      | #end |
+| wit3 | #start |      |      |      | a(0) |      |      | d(1) | b(2) | #end |
++------+--------+------+------+------+------+------+------+------+------+------+"]
+	33 -> 34 [label=ae]
+	35 [label="Placed witness tokens (pct): 1.00
+Score (tokens / toList length): 1.44
++------+--------+------+------+------+------+------+------+------+------+------+
+| wit1 | #start | a(0) | b(1) | c(2) | a(3) |      |      | d(4) | e(5) | #end |
+| wit2 | #start |      |      |      | a(0) | e(1) | c(2) | d(3) |      | #end |
+| wit3 | #start |      |      |      | a(0) |      |      | d(1) | b(2) | #end |
++------+--------+------+------+------+------+------+------+------+------+------+"]
+	33 -> 35 [label=ae]
+	36 [label="Placed witness tokens (pct): 0.85
+Score (tokens / toList length): 1.57
++------+--------+------+------+------+------+------+------+------+------+
+| wit1 | #start | a(0) | b(1) | c(2) | a(3) |      | d(4) |      | #end |
+| wit2 | #start |      |      |      | a(0) | c(2) | d(3) |      | #end |
+| wit3 | #start |      |      |      | a(0) |      | d(1) | b(2) | #end |
++------+--------+------+------+------+------+------+------+------+------+"]
+	31 -> 36 [label=cd]
+	37 [label="Placed witness tokens (pct): 0.85
+Score (tokens / toList length): 1.57
++------+--------+------+------+------+------+------+------+------+------+
+| wit1 | #start | a(0) | b(1) | c(2) | a(3) |      | d(4) |      | #end |
+| wit2 | #start |      |      |      | a(0) | c(2) | d(3) |      | #end |
+| wit3 | #start |      |      |      | a(0) |      | d(1) | b(2) | #end |
++------+--------+------+------+------+------+------+------+------+------+"]
+	36 -> 37 [label=ac]
+	38 [label="Placed witness tokens (pct): 1.00
+Score (tokens / toList length): 1.44
++------+--------+------+------+------+------+------+------+------+------+------+
+| wit1 | #start | a(0) | b(1) | c(2) | a(3) |      |      | d(4) | e(5) | #end |
+| wit2 | #start |      |      |      | a(0) | e(1) | c(2) | d(3) |      | #end |
+| wit3 | #start |      |      |      | a(0) |      |      | d(1) | b(2) | #end |
++------+--------+------+------+------+------+------+------+------+------+------+"]
+	37 -> 38 [label=ae]
+	39 [label="Placed witness tokens (pct): 1.00
+Score (tokens / toList length): 1.44
++------+--------+------+------+------+------+------+------+------+------+------+
+| wit1 | #start | a(0) | b(1) | c(2) | a(3) |      |      | d(4) | e(5) | #end |
+| wit2 | #start |      |      |      | a(0) | e(1) | c(2) | d(3) |      | #end |
+| wit3 | #start |      |      |      | a(0) |      |      | d(1) | b(2) | #end |
++------+--------+------+------+------+------+------+------+------+------+------+"]
+	37 -> 39 [label=ae]
+	40 [label="Placed witness tokens (pct): 0.69
+Score (tokens / toList length): 1.80
++------+--------+------+------+------+------+------+------+
+| wit1 | #start | a(0) | c(2) | a(3) |      | d(4) | #end |
+| wit2 | #start |      |      | a(0) | c(2) | d(3) | #end |
+| wit3 | #start |      |      | a(0) |      | d(1) | #end |
++------+--------+------+------+------+------+------+------+"]
+	30 -> 40 [label=ac]
+	41 [label="Placed witness tokens (pct): 0.85
+Score (tokens / toList length): 1.57
++------+--------+------+------+------+------+------+------+------+------+
+| wit1 | #start | a(0) | b(1) | c(2) | a(3) |      | d(4) |      | #end |
+| wit2 | #start |      |      |      | a(0) | c(2) | d(3) |      | #end |
+| wit3 | #start |      |      |      | a(0) |      | d(1) | b(2) | #end |
++------+--------+------+------+------+------+------+------+------+------+"]
+	40 -> 41 [label=ab]
+	42 [label="Placed witness tokens (pct): 0.85
+Score (tokens / toList length): 1.57
++------+--------+------+------+------+------+------+------+------+------+
+| wit1 | #start | a(0) | b(1) | c(2) | a(3) |      | d(4) |      | #end |
+| wit2 | #start |      |      |      | a(0) | c(2) | d(3) |      | #end |
+| wit3 | #start |      |      |      | a(0) |      | d(1) | b(2) | #end |
++------+--------+------+------+------+------+------+------+------+------+"]
+	41 -> 42 [label=cd]
+	43 [label="Placed witness tokens (pct): 1.00
+Score (tokens / toList length): 1.44
++------+--------+------+------+------+------+------+------+------+------+------+
+| wit1 | #start | a(0) | b(1) | c(2) | a(3) |      |      | d(4) | e(5) | #end |
+| wit2 | #start |      |      |      | a(0) | e(1) | c(2) | d(3) |      | #end |
+| wit3 | #start |      |      |      | a(0) |      |      | d(1) | b(2) | #end |
++------+--------+------+------+------+------+------+------+------+------+------+"]
+	42 -> 43 [label=ae]
+	44 [label="Placed witness tokens (pct): 1.00
+Score (tokens / toList length): 1.44
++------+--------+------+------+------+------+------+------+------+------+------+
+| wit1 | #start | a(0) | b(1) | c(2) | a(3) |      |      | d(4) | e(5) | #end |
+| wit2 | #start |      |      |      | a(0) | e(1) | c(2) | d(3) |      | #end |
+| wit3 | #start |      |      |      | a(0) |      |      | d(1) | b(2) | #end |
++------+--------+------+------+------+------+------+------+------+------+------+"]
+	42 -> 44 [label=ae]
+	45 [label="Placed witness tokens (pct): 0.69
+Score (tokens / toList length): 1.80
++------+--------+------+------+------+------+------+------+
+| wit1 | #start | a(0) | c(2) | a(3) |      | d(4) | #end |
+| wit2 | #start |      |      | a(0) | c(2) | d(3) | #end |
+| wit3 | #start |      |      | a(0) |      | d(1) | #end |
++------+--------+------+------+------+------+------+------+"]
+	40 -> 45 [label=cd]
+	46 [label="Placed witness tokens (pct): 0.85
+Score (tokens / toList length): 1.57
++------+--------+------+------+------+------+------+------+------+------+
+| wit1 | #start | a(0) | b(1) | c(2) | a(3) |      | d(4) |      | #end |
+| wit2 | #start |      |      |      | a(0) | c(2) | d(3) |      | #end |
+| wit3 | #start |      |      |      | a(0) |      | d(1) | b(2) | #end |
++------+--------+------+------+------+------+------+------+------+------+"]
+	45 -> 46 [label=ab]
+	47 [label="Placed witness tokens (pct): 1.00
+Score (tokens / toList length): 1.44
++------+--------+------+------+------+------+------+------+------+------+------+
+| wit1 | #start | a(0) | b(1) | c(2) | a(3) |      |      | d(4) | e(5) | #end |
+| wit2 | #start |      |      |      | a(0) | e(1) | c(2) | d(3) |      | #end |
+| wit3 | #start |      |      |      | a(0) |      |      | d(1) | b(2) | #end |
++------+--------+------+------+------+------+------+------+------+------+------+"]
+	46 -> 47 [label=ae]
+	48 [label="Placed witness tokens (pct): 1.00
+Score (tokens / toList length): 1.44
++------+--------+------+------+------+------+------+------+------+------+------+
+| wit1 | #start | a(0) | b(1) | c(2) | a(3) |      |      | d(4) | e(5) | #end |
+| wit2 | #start |      |      |      | a(0) | e(1) | c(2) | d(3) |      | #end |
+| wit3 | #start |      |      |      | a(0) |      |      | d(1) | b(2) | #end |
++------+--------+------+------+------+------+------+------+------+------+------+"]
+	46 -> 48 [label=ae]
+	49 [label="Placed witness tokens (pct): 0.62
+Score (tokens / toList length): 2.00
++------+--------+------+------+------+------+------+
+| wit1 | #start | c(2) | a(3) |      | d(4) | #end |
+| wit2 | #start |      | a(0) | c(2) | d(3) | #end |
+| wit3 | #start |      | a(0) |      | d(1) | #end |
++------+--------+------+------+------+------+------+"]
+	30 -> 49 [label=cd]
+	50 [label="Placed witness tokens (pct): 0.85
+Score (tokens / toList length): 1.57
++------+--------+------+------+------+------+------+------+------+------+
+| wit1 | #start | a(0) | b(1) | c(2) | a(3) |      | d(4) |      | #end |
+| wit2 | #start |      |      |      | a(0) | c(2) | d(3) |      | #end |
+| wit3 | #start |      |      |      | a(0) |      | d(1) | b(2) | #end |
++------+--------+------+------+------+------+------+------+------+------+"]
+	49 -> 50 [label=ab]
+	51 [label="Placed witness tokens (pct): 0.85
+Score (tokens / toList length): 1.57
++------+--------+------+------+------+------+------+------+------+------+
+| wit1 | #start | a(0) | b(1) | c(2) | a(3) |      | d(4) |      | #end |
+| wit2 | #start |      |      |      | a(0) | c(2) | d(3) |      | #end |
+| wit3 | #start |      |      |      | a(0) |      | d(1) | b(2) | #end |
++------+--------+------+------+------+------+------+------+------+------+"]
+	50 -> 51 [label=ac]
+	52 [label="Placed witness tokens (pct): 1.00
+Score (tokens / toList length): 1.44
++------+--------+------+------+------+------+------+------+------+------+------+
+| wit1 | #start | a(0) | b(1) | c(2) | a(3) |      |      | d(4) | e(5) | #end |
+| wit2 | #start |      |      |      | a(0) | e(1) | c(2) | d(3) |      | #end |
+| wit3 | #start |      |      |      | a(0) |      |      | d(1) | b(2) | #end |
++------+--------+------+------+------+------+------+------+------+------+------+"]
+	51 -> 52 [label=ae]
+	53 [label="Placed witness tokens (pct): 1.00
+Score (tokens / toList length): 1.44
++------+--------+------+------+------+------+------+------+------+------+------+
+| wit1 | #start | a(0) | b(1) | c(2) | a(3) |      |      | d(4) | e(5) | #end |
+| wit2 | #start |      |      |      | a(0) | e(1) | c(2) | d(3) |      | #end |
+| wit3 | #start |      |      |      | a(0) |      |      | d(1) | b(2) | #end |
++------+--------+------+------+------+------+------+------+------+------+------+"]
+	51 -> 53 [label=ae]
+	54 [label="Placed witness tokens (pct): 0.69
+Score (tokens / toList length): 1.80
++------+--------+------+------+------+------+------+------+
+| wit1 | #start | a(0) | c(2) | a(3) |      | d(4) | #end |
+| wit2 | #start |      |      | a(0) | c(2) | d(3) | #end |
+| wit3 | #start |      |      | a(0) |      | d(1) | #end |
++------+--------+------+------+------+------+------+------+"]
+	49 -> 54 [label=ac]
+	55 [label="Placed witness tokens (pct): 0.85
+Score (tokens / toList length): 1.57
++------+--------+------+------+------+------+------+------+------+------+
+| wit1 | #start | a(0) | b(1) | c(2) | a(3) |      | d(4) |      | #end |
+| wit2 | #start |      |      |      | a(0) | c(2) | d(3) |      | #end |
+| wit3 | #start |      |      |      | a(0) |      | d(1) | b(2) | #end |
++------+--------+------+------+------+------+------+------+------+------+"]
+	54 -> 55 [label=ab]
+	56 [label="Placed witness tokens (pct): 1.00
+Score (tokens / toList length): 1.44
++------+--------+------+------+------+------+------+------+------+------+------+
+| wit1 | #start | a(0) | b(1) | c(2) | a(3) |      |      | d(4) | e(5) | #end |
+| wit2 | #start |      |      |      | a(0) | e(1) | c(2) | d(3) |      | #end |
+| wit3 | #start |      |      |      | a(0) |      |      | d(1) | b(2) | #end |
++------+--------+------+------+------+------+------+------+------+------+------+"]
+	55 -> 56 [label=ae]
+	57 [label="Placed witness tokens (pct): 1.00
+Score (tokens / toList length): 1.44
++------+--------+------+------+------+------+------+------+------+------+------+
+| wit1 | #start | a(0) | b(1) | c(2) | a(3) |      |      | d(4) | e(5) | #end |
+| wit2 | #start |      |      |      | a(0) | e(1) | c(2) | d(3) |      | #end |
+| wit3 | #start |      |      |      | a(0) |      |      | d(1) | b(2) | #end |
++------+--------+------+------+------+------+------+------+------+------+------+"]
+	55 -> 57 [label=ae]
 }
