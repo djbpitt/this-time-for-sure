@@ -205,7 +205,8 @@ def expand_dtNode(_parent: dtNode):
         for _choice in _choices:
             # concatenate remaining members of _currents plus all _non_currents
             # already sorted, but reset index since we link index value to len(_currents)
-            _newChild:dtNode = dtNode(copy.deepcopy(_parent.toList), _skipgram, copy.deepcopy(_parent.bitArray_dict),
+            print(_choice)
+            _newChild:dtNode = dtNode(copy.deepcopy(_parent.toList), _skipgram + str(_choice), copy.deepcopy(_parent.bitArray_dict),
                                _remainder)  # pop top of parent df and copy remainder to child
             _parent.children.append(_newChild)  # parents know who their children are
             for _witnessToken in _choice:
@@ -321,10 +322,7 @@ if __name__ == "__main__":
     # root of decision tree inherits empty toList, bitArray_dict with 0 values, and complete, sorted df
     dtRoot = dtNode([Node("#start"), Node("#end")], "[none]", bitArray_dict, csDf)
     expand_dtNode(dtRoot)
-    print(dtRoot.children)
     for child in dtRoot.children:
         expand_dtNode(child)
-        print(child.children)
         for grandchild in child.children:
             expand_dtNode(grandchild)
-            print(grandchild.children)
