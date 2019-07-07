@@ -179,20 +179,20 @@ def place_token(_toList: list, _norm: str, _siglum: str, _offset: int):
     return _toList
 
 
-def compute_priority(_df: pd.DataFrame):
-    """ Assign processing priority to skipgrams and use it to group and sort them
-
-    :param _df: dataframe to prioritize
-    :return: (none)
-
-    (not currently using stopword list to filter)
-    1. Deepest block (most witnesses) first (unique_witnessCount: int)
-    2. Within that, words that don’t repeat within a witness first (witness_uniqueness: bool)
-    3. within that, rarest skipgrams first (less repetition is easier to place correctly) (local_witnessCount: int)
-    """
-    _df.sort_values(by=["unique_witnessCount", "witness_uniqueness", "local_witnessCount"],
-                    ascending=[False, False, True], inplace=True)
-    _df.reset_index(inplace=True, drop=True)  # update row numbers
+# def compute_priority(_df: pd.DataFrame):
+#     """ Assign processing priority to skipgrams and use it to group and sort them
+#
+#     :param _df: dataframe to prioritize
+#     :return: (none)
+#
+#     (not currently using stopword list to filter)
+#     1. Deepest block (most witnesses) first (unique_witnessCount: int)
+#     2. Within that, words that don’t repeat within a witness first (witness_uniqueness: bool)
+#     3. within that, rarest skipgrams first (less repetition is easier to place correctly) (local_witnessCount: int)
+#     """
+#     _df.sort_values(by=["unique_witnessCount", "witness_uniqueness", "local_witnessCount"],
+#                     ascending=[False, False, True], inplace=True)
+#     _df.reset_index(inplace=True, drop=True)  # update row numbers
 
 
 def step(_df: pd.DataFrame):
@@ -200,6 +200,8 @@ def step(_df: pd.DataFrame):
     _top = max(_df["priority"])
     _current = _df[_df["priority"] == _top]
     _remainder = _df[_df["priority"] != _top]
+
+
     return _current, _remainder  # process current, then call again with remainder to continue
 
 
@@ -319,7 +321,7 @@ if __name__ == "__main__":
     csDf["local_witnessCount"] = csDf["local_witnesses"].str.len()
     csDf["unique_witnessCount"] = csDf["unique_witnesses"].str.len()
     csDf["witness_uniqueness"] = csDf["local_witnessCount"] == csDf["unique_witnessCount"]
-    scale = pd.Series([100, -1, 10])
+    scale = pd.Series([100, 10, 1])
     csDf["priority"] = pd.np.dot(csDf[["unique_witnessCount", "witness_uniqueness", "local_witnessCount"]], scale)
 
     # are both tokens are stopwords? (if so, we’ll process them last)
@@ -330,9 +332,11 @@ if __name__ == "__main__":
     #   1. Words that don’t repeat within a witness first
     #   2. Within that, deepest block (most witnesses) first
     #   3. within that, rarest skipgrams first (less repetition is easier to place correctly)
-    csDf.sort_values(by=["unique_witnessCount", "witness_uniqueness", "local_witnessCount"],
-                     ascending=[False, False, True],
-                     inplace=True)
+    csDf.sort_values(by="priority", ascending=False, inplace=True)
+
+    # csDf.sort_values(by=["unique_witnessCount", "witness_uniqueness", "local_witnessCount"],
+    #                  ascending=[False, False, True],
+    #                  inplace=True)
     csDf.reset_index(inplace=True, drop=True)  # update row numbers
 
     # root of decision tree inherits empty toList, bitArray_dict with 0 values, and complete, sorted df
@@ -341,35 +345,59 @@ if __name__ == "__main__":
     # process root
     parent: dtNode = dtRoot  # node to expand
     current, remainder = step(csDf)  # current is rows to add, remainder is ... well ... what’s left
+    # what does current do?
+
+    # current is the skipgram to place, so that is in this case is (a, d)
+#    print(current)
+
+    # remainder is the rest of skipgrams to place
+#    print(remainder)
+
     for i in range(len(current)):
+        print_alignment_table(parent, witnessData, True)
+        #print(parent)
+
         expand_dtNode(parent, current.iloc[i, :],
                       pd.concat([current.drop(i, axis=0), remainder]))  # expands in place, adds children
-        print_alignment_table(parent, witnessData, True)
-        print(parent)
+
+        # we expect there to be 2
+        print(parent.children)
+
+        # print(parent.children[0].df)
+
+    # we go down to the second level
     for child in parent.children:
         print("\nOne level down")
         print_alignment_table(child, witnessData, True)  # before expanding
-        print(child)
+        #        print(child)
         print_score(child)
-        print("Placed skipgram:", child.skipgram)
-        print("Percentage of witness tokens placed:", print_placed_witness_tokens(child))
+        print("Current child: "+str(child))
         current_c, remainder_c = step(child.df)
+        print("Skipgram to process: "+str(current_c))
         for j in range(len(current_c)):
+            # print("Remainder for this grandchild: "+str(pd.concat([current_c.drop(j, axis=0), remainder_c])))
             expand_dtNode(child, current_c.iloc[j, :], pd.concat([current_c.drop(j, axis=0), remainder_c]))
-            for grandchild in child.children:
-                print("\nTwo levels down")
-                print_alignment_table(grandchild, witnessData, True)  # before expanding
-                print(grandchild)
-                print_score(grandchild)
-                print("Placed skipgram:", grandchild.skipgram)
-                print("Percentage of witness tokens placed:", print_placed_witness_tokens(grandchild))
-                current_d, remainder_d = step(grandchild.df)
-                for k in range(len(current_d)):
-                    expand_dtNode(grandchild, current_d.iloc[k, :], pd.concat([current_d.drop(k, axis=0), remainder_d]))
-                    for greatgrandchild in grandchild.children:
-                        print("\nThree levels down")
-                        print_alignment_table(greatgrandchild, witnessData, True)
-                        print(greatgrandchild)
-                        print_score(greatgrandchild)
-                        print("Placed skipgram:", greatgrandchild.skipgram)
-                        print("Percentage of witness tokens placed:", print_placed_witness_tokens(greatgrandchild))
+        for grandchild in child.children:
+            print("\nTwo levels down")
+            print_alignment_table(grandchild, witnessData, True)  # before expanding
+            print(grandchild)
+
+            current_d, remainder_d = step(grandchild.df)
+            for k in range(len(current_d)):
+                expand_dtNode(grandchild, current_d.iloc[k, :], pd.concat([current_d.drop(k, axis=0), remainder_d]))
+
+            for greatgrandchild in grandchild.children:
+                print("\nThree levels down")
+                print_alignment_table(greatgrandchild, witnessData, True)
+                print(greatgrandchild)
+                print_score(greatgrandchild)
+                print("Placed skipgram:", greatgrandchild.skipgram)
+                print("Percentage of witness tokens placed:", print_placed_witness_tokens(greatgrandchild))
+
+
+
+    #     print("Placed skipgram:", child.skipgram)
+    #     print("Percentage of witness tokens placed:", print_placed_witness_tokens(child))
+    #             print_score(grandchild)
+    #             print("Placed skipgram:", grandchild.skipgram)
+    #             print("Percentage of witness tokens placed:", print_placed_witness_tokens(grandchild))
