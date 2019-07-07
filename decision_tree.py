@@ -205,8 +205,7 @@ def expand_dtNode(_parent: dtNode):
         for _choice in _choices:
             # concatenate remaining members of _currents plus all _non_currents
             # already sorted, but reset index since we link index value to len(_currents)
-            print(_choice)
-            _newChild:dtNode = dtNode(copy.deepcopy(_parent.toList), _skipgram + str(_choice), copy.deepcopy(_parent.bitArray_dict),
+            _newChild:dtNode = dtNode(copy.deepcopy(_parent.toList), prettify_skipgram_location(_skipgram, _choice), copy.deepcopy(_parent.bitArray_dict),
                                _remainder)  # pop top of parent df and copy remainder to child
             _parent.children.append(_newChild)  # parents know who their children are
             for _witnessToken in _choice:
@@ -226,6 +225,12 @@ def expand_dtNode(_parent: dtNode):
                     else:
                         place_token(_newChild.toList, _norm, _siglum, _offset)
                         _newChild.bitArray_dict[_siglum][_offset] = 1  # record that we've processed this token
+
+
+def prettify_skipgram_location(_skipgram: str, _location: tuple):
+    _clean_choice = _skipgram + " (" + "; ".join(["".join([_c[0], ":", str(_c[1]), ",", str(_c[2])]) for _c in _location]) + ")"
+    return _clean_choice
+
 
 
 def print_alignment_table(_dtNode: dtNode, _witnessData: dict, _print_witness_offset):
