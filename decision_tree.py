@@ -179,73 +179,52 @@ def place_token(_toList: list, _norm: str, _siglum: str, _offset: int):
     return _toList
 
 
-# def compute_priority(_df: pd.DataFrame):
-#     """ Assign processing priority to skipgrams and use it to group and sort them
-#
-#     :param _df: dataframe to prioritize
-#     :return: (none)
-#
-#     (not currently using stopword list to filter)
-#     1. Deepest block (most witnesses) first (unique_witnessCount: int)
-#     2. Within that, words that don’t repeat within a witness first (witness_uniqueness: bool)
-#     3. within that, rarest skipgrams first (less repetition is easier to place correctly) (local_witnessCount: int)
-#     """
-#     _df.sort_values(by=["unique_witnessCount", "witness_uniqueness", "local_witnessCount"],
-#                     ascending=[False, False, True], inplace=True)
-#     _df.reset_index(inplace=True, drop=True)  # update row numbers
-
-
-def step(_df: pd.DataFrame):
-    """walk through rows grouped by priority"""
-    _top = max(_df["priority"])
-    _current = _df[_df["priority"] == _top]
-    _remainder = _df[_df["priority"] != _top]
-
-
-    return _current, _remainder  # process current, then call again with remainder to continue
-
-
-def expand_dtNode(_parent: dtNode, _new_row: pd.Series, _remaining_rows: pd.DataFrame):
+def expand_dtNode(_parent: dtNode):
     """ Add children to node in decision tree
 
-    :param _new_row:
-    :param _remaining_rows:
     :param _parent: dtNode: decision tree node to be expanded
     :return: (none; expands in place)
     """
-    # isolate next skipgram to process
-    # _current: pd.Series = _parent.df.iloc[0, :]
-    _current: pd.Series = _new_row
-    _skipgram = _current["first"] + _current["second"]
-    # Identify all possible placements of skipgram
-    _d = collections.defaultdict(list)
-    for _i in _current.locations:
-        _d[_i[0]].append(_i)
-    _choices: list = list(itertools.product(*_d.values()))
-    # print("\nThere are", len(_choices), "choices at this level")
-    for _choice in _choices:
-        _remainder = _remaining_rows.copy().sort_values(by="priority", ascending=False)
+    # isolate next skipgrams to process (all with highest priority)
+    _top: int = max(_parent.df["priority"])
+    _currents: pd.DataFrame = _parent.df[_parent.df["priority"] == _top]
+    _non_currents: pd.DataFrame = _parent.df[_parent.df["priority"] != _top]
+    for _current_position in range(len(_currents)):
+        _current = _currents.iloc[_current_position, :] # create a child for each of the highest priority skipgrams
+        _skipgram = _current["first"] + _current["second"]
+        _remainder = pd.concat([_currents.drop(_current_position), _non_currents])
         _remainder.reset_index(inplace=True, drop=True)
-        _newChild = dtNode(copy.deepcopy(_parent.toList), _skipgram, copy.deepcopy(_parent.bitArray_dict),
-                           _remainder)  # pop top of parent df and copy remainder to child
-        _parent.children.append(_newChild)  # parents know who their children are
-        for _witnessToken in _choice:
-            for _position, _norm in enumerate(
-                    [_current["first"], _current["second"]]):  # position (0, 1) is first or second skipgram token
-                ###
-                # what siglum and offset are we looking for?
-                ###
-                _siglum: str = _witnessToken[0]
-                _offset: int = _witnessToken[_position + 1]
-                ###
-                # do we need to process it, or have we already taken care of it?
-                ###
-                # print(_newChild.bitArray_dict)
-                if _newChild.bitArray_dict[_siglum][_offset]:  # already set, so break for this location
-                    continue
-                else:
-                    place_token(_newChild.toList, _norm, _siglum, _offset)
-                    _newChild.bitArray_dict[_siglum][_offset] = 1  # record that we've processed this token
+        ###
+        # _choices is a list of all possible placements of skipgram
+        # Values are (siglum, offset_a, offset_b) tuples
+        ###
+        _d = collections.defaultdict(list)
+        for _i in _current.locations:
+            _d[_i[0]].append(_i)
+        _choices: list = list(itertools.product(*_d.values()))
+        for _choice in _choices:
+            # concatenate remaining members of _currents plus all _non_currents
+            # already sorted, but reset index since we link index value to len(_currents)
+            _newChild:dtNode = dtNode(copy.deepcopy(_parent.toList), _skipgram, copy.deepcopy(_parent.bitArray_dict),
+                               _remainder)  # pop top of parent df and copy remainder to child
+            _parent.children.append(_newChild)  # parents know who their children are
+            for _witnessToken in _choice:
+                for _position, _norm in enumerate(
+                        [_current["first"], _current["second"]]):  # position (0, 1) is first or second skipgram token
+                    ###
+                    # what siglum and offset are we looking for?
+                    ###
+                    _siglum: str = _witnessToken[0]
+                    _offset: int = _witnessToken[_position + 1]
+                    ###
+                    # do we need to process it, or have we already taken care of it?
+                    ###
+                    # print(_newChild.bitArray_dict)
+                    if _newChild.bitArray_dict[_siglum][_offset]:  # already set, so break for this location
+                        continue
+                    else:
+                        place_token(_newChild.toList, _norm, _siglum, _offset)
+                        _newChild.bitArray_dict[_siglum][_offset] = 1  # record that we've processed this token
 
 
 def print_alignment_table(_dtNode: dtNode, _witnessData: dict, _print_witness_offset):
@@ -341,63 +320,11 @@ if __name__ == "__main__":
 
     # root of decision tree inherits empty toList, bitArray_dict with 0 values, and complete, sorted df
     dtRoot = dtNode([Node("#start"), Node("#end")], "[none]", bitArray_dict, csDf)
-
-    # process root
-    parent: dtNode = dtRoot  # node to expand
-    current, remainder = step(csDf)  # current is rows to add, remainder is ... well ... what’s left
-    # what does current do?
-
-    # current is the skipgram to place, so that is in this case is (a, d)
-#    print(current)
-
-    # remainder is the rest of skipgrams to place
-#    print(remainder)
-
-    for i in range(len(current)):
-        print_alignment_table(parent, witnessData, True)
-        #print(parent)
-
-        expand_dtNode(parent, current.iloc[i, :],
-                      pd.concat([current.drop(i, axis=0), remainder]))  # expands in place, adds children
-
-        # we expect there to be 2
-        print(parent.children)
-
-        # print(parent.children[0].df)
-
-    # we go down to the second level
-    for child in parent.children:
-        print("\nOne level down")
-        print_alignment_table(child, witnessData, True)  # before expanding
-        #        print(child)
-        print_score(child)
-        print("Current child: "+str(child))
-        current_c, remainder_c = step(child.df)
-        print("Skipgram to process: "+str(current_c))
-        for j in range(len(current_c)):
-            # print("Remainder for this grandchild: "+str(pd.concat([current_c.drop(j, axis=0), remainder_c])))
-            expand_dtNode(child, current_c.iloc[j, :], pd.concat([current_c.drop(j, axis=0), remainder_c]))
+    expand_dtNode(dtRoot)
+    print(dtRoot.children)
+    for child in dtRoot.children:
+        expand_dtNode(child)
+        print(child.children)
         for grandchild in child.children:
-            print("\nTwo levels down")
-            print_alignment_table(grandchild, witnessData, True)  # before expanding
-            print(grandchild)
-
-            current_d, remainder_d = step(grandchild.df)
-            for k in range(len(current_d)):
-                expand_dtNode(grandchild, current_d.iloc[k, :], pd.concat([current_d.drop(k, axis=0), remainder_d]))
-
-            for greatgrandchild in grandchild.children:
-                print("\nThree levels down")
-                print_alignment_table(greatgrandchild, witnessData, True)
-                print(greatgrandchild)
-                print_score(greatgrandchild)
-                print("Placed skipgram:", greatgrandchild.skipgram)
-                print("Percentage of witness tokens placed:", print_placed_witness_tokens(greatgrandchild))
-
-
-
-    #     print("Placed skipgram:", child.skipgram)
-    #     print("Percentage of witness tokens placed:", print_placed_witness_tokens(child))
-    #             print_score(grandchild)
-    #             print("Placed skipgram:", grandchild.skipgram)
-    #             print("Percentage of witness tokens placed:", print_placed_witness_tokens(grandchild))
+            expand_dtNode(grandchild)
+            print(grandchild.children)
