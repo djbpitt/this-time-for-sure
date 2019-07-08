@@ -36,15 +36,20 @@ a, (b ~ e), c, a, d, (b ~ e)
 
 ## Scoring considerations
 
-Actual and potential scoring methods must observe the same scale, since the total score for any branch is the sum of those values on that branch.
+1. Total score for any node on the decision tree is the sum of the actual and potential scores. For that reason, the two scores must observe the same scale.
+1. Each step moves tokens from the potential score to the actual score. 
+
 
 ### Actual score
 
-1. The *actual score* takes order into account.
+1. The actual score takes order into account.
 3. The best actual score maximizes the information value per node. For example, given 2 nodes with a total of 4 tokens, the *average* information value of each node is 2 in both cases. But we prefer 3 tokens on 1 node and 1 token on the other to 2 tokens on each. Therefore:
 	4. We cannot just average the tokens per node, since that value would be 2 in both of the preceding cases.
 	5. We could, instead, square each number of tokens per node and divide by the number of nodes. In that case, 3 and 1 would yield 5 (3^2 + 1^2 = 9 + 1 = 10; then divide by 2) and 2 and 2 would yield 4 (2^2 + 2^2 = 4 + 4 = 8; then divide by 2).
 
 ### Potential score
 
-2. The *potential score* ignores order.
+1. Potential score makes optimistic judgments, that is, the best possible potential score.
+1. The potential score is the best clustering you can make with the tokens yet to be placed, given the existing clusters. 
+	2. The best case is that they can all be accommodated in existing clusters, and require no new nodes.
+1. The potential score ignores order.
