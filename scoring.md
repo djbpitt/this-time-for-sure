@@ -36,6 +36,8 @@ a, (b ~ e), c, a, d, (b ~ e)
 
 ## Scoring considerations
 
+Actual and potential scoring methods must observe the same scale, since the total score for any branch is the sum of those values on that branch.
+
 ### Actual score
 
 1. The *actual score* takes order into account.
