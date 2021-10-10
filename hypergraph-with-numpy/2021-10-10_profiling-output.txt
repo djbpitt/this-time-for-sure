@@ -1,0 +1,133 @@
+2021-10-10 rhd/djb profiling Alignment hypergraph to variant graph with networkx and masked arrays
+
+
+         666764493 function calls (666751257 primitive calls) in 976.042 seconds
+
+   Ordered by: internal time
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+ 14020274  160.629    0.000  465.925    0.000 core.py:2975(__array_finalize__)
+ 21033816  146.783    0.000  437.059    0.000 {built-in method numpy.array}
+ 14040128  122.705    0.000  186.407    0.000 core.py:2949(_update_from)
+  6986974   91.293    0.000  533.293    0.000 2162113027.py:1(convert_hyperedge_to_masked_array)
+  6993592   71.609    0.000  776.661    0.000 core.py:2819(__new__)
+ 49031299   41.376    0.000   41.376    0.000 core.py:3406(dtype)
+147341928   37.976    0.000   37.976    0.000 {built-in method builtins.getattr}
+ 63577411   30.358    0.000   30.358    0.000 {method 'update' of 'dict' objects}
+ 13993802   29.568    0.000   40.472    0.000 core.py:1316(_replace_dtype_fields)
+ 41921922   19.035    0.000   19.035    0.000 1852941637.py:21(__contains__)
+ 91216156   18.578    0.000   18.578    0.000 {method 'append' of 'list' objects}
+7033300/7026682   17.958    0.000   18.015    0.000 {method 'view' of 'numpy.generic' objects}
+     6618   16.785    0.003  960.452    0.145 3462547911.py:1(check_whether_okay_to_place)
+  6986974   16.488    0.000   16.488    0.000 {method 'astype' of 'numpy.ndarray' objects}
+ 56236697   15.894    0.000   15.894    0.000 {built-in method builtins.isinstance}
+     6618   15.296    0.002  357.956    0.054 core.py:2868(<listcomp>)
+7092862/7086244   13.621    0.000  188.732    0.000 {method 'view' of 'numpy.ndarray' objects}
+ 28439193   13.285    0.000   13.285    0.000 1852941637.py:19(__getitem__)
+ 21033720   12.592    0.000   19.276    0.000 core.py:1363(getmask)
+ 14013656   11.962    0.000   11.962    0.000 core.py:3422(shape)
+ 13993802   11.469    0.000   51.941    0.000 core.py:1330(make_mask_descr)
+ 13993802   10.905    0.000   10.905    0.000 core.py:1284(_replace_dtype_fields_recursive)
+     6618    8.571    0.001  925.048    0.140 3669642993.py:1(convert_alignment_graph_to_numpy_masked_array)
+  6986974    5.363    0.000   11.657    0.000 core.py:1425(getmaskarray)
+     6618    5.333    0.001    6.999    0.001 core.py:1011(__call__)
+  6980356    4.849    0.000  331.009    0.000 _asarray.py:86(asanyarray)
+    72894    4.140    0.000    4.140    0.000 {method 'reduce' of 'numpy.ufunc' objects}
+   390166    3.126    0.000    6.683    0.000 1013800550.py:1(merge_hyperedge)
+     9317    2.235    0.000    2.235    0.000 socket.py:342(send)
+  7013446    1.892    0.000    1.978    0.000 {built-in method builtins.hasattr}
+     3325    1.503    0.000    5.293    0.002 264385867.py:1(create_hyperedges)
+   390217    1.070    0.000    1.831    0.000 1852941637.py:3(__init__)
+   952666    0.937    0.000    0.937    0.000 1852941637.py:12(__setitem__)
+   390166    0.884    0.000    0.884    0.000 1852941637.py:26(<listcomp>)
+    39804    0.844    0.000    0.844    0.000 {built-in method numpy.core._multiarray_umath.implement_array_function}
+   390217    0.747    0.000    0.747    0.000 264385867.py:15(<dictcomp>)
+   390217    0.678    0.000    0.678    0.000 264385867.py:6(<listcomp>)
+        1    0.671    0.671  976.042  976.042 1281428236.py:5(process_blocks)
+   390166    0.545    0.000    1.429    0.000 1852941637.py:25(items)
+   390166    0.454    0.000    0.454    0.000 1013800550.py:5(<listcomp>)
+   390217    0.430    0.000    0.430    0.000 264385867.py:7(<listcomp>)
+    13236    0.349    0.000    0.554    0.000 core.py:3434(__setmask__)
+    23211    0.309    0.000    0.309    0.000 {method 'copy' of 'numpy.ndarray' objects}
+   390217    0.272    0.000    0.272    0.000 {method 'keys' of 'dict' objects}
+     6618    0.266    0.000    3.879    0.001 core.py:5660(min)
+     6618    0.216    0.000    7.224    0.001 core.py:4149(__sub__)
+     6618    0.195    0.000    0.665    0.000 core.py:1695(mask_or)
+    23211    0.185    0.000    1.147    0.000 {method 'all' of 'numpy.ndarray' objects}
+    19854    0.183    0.000    0.186    0.000 _ufunc_config.py:132(geterr)
+   797157    0.182    0.000    0.182    0.000 {built-in method builtins.len}
+     6648    0.175    0.000    2.907    0.000 iostream.py:500(write)
+    36447    0.157    0.000    0.157    0.000 multiarray.py:1043(copyto)
+   390217    0.156    0.000    0.156    0.000 1852941637.py:5(<listcomp>)
+    13236    0.144    0.000    0.204    0.000 core.py:288(_scalar_fill_value)
+    19854    0.132    0.000    0.414    0.000 _ufunc_config.py:32(seterr)
+     9317    0.127    0.000    2.613    0.000 iostream.py:206(schedule)
+    13236    0.120    0.000    0.321    0.000 core.py:3666(fill_value)
+     9317    0.118    0.000    0.118    0.000 iostream.py:96(_event_pipe)
+     9975    0.111    0.000    0.111    0.000 {built-in method _operator.eq}
+     6618    0.109    0.000    3.207    0.000 core.py:5794(max)
+     9317    0.106    0.000    0.130    0.000 threading.py:1071(is_alive)
+     6618    0.106    0.000    0.121    0.000 core.py:645(get_masked_subclass)
+     6618    0.102    0.000    0.333    0.000 core.py:3124(view)
+    36447    0.100    0.000    1.138    0.000 {method 'any' of 'numpy.ndarray' objects}
+     6618    0.098    0.000    1.167    0.000 {method 'min' of 'numpy.ndarray' objects}
+     6648    0.096    0.000    0.096    0.000 {built-in method posix.getpid}
+    46326    0.086    0.000    0.112    0.000 core.py:3636(_get_data)
+    13236    0.082    0.000    0.476    0.000 core.py:286(_extremum_fill_value)
+    19854    0.081    0.000    1.467    0.000 core.py:3730(filled)
+    26472    0.079    0.000    0.180    0.000 core.py:221(_get_dtype_of)
+    19854    0.079    0.000    0.079    0.000 {built-in method numpy.seterrobj}
+     6618    0.073    0.000    1.261    0.000 core.py:4041(_comparison)
+     6618    0.073    0.000    1.334    0.000 core.py:4105(__eq__)
+     6618    0.072    0.000    0.302    0.000 _ufunc_config.py:433(__enter__)
+     6618    0.068    0.000    0.069    0.000 core.py:588(filled)
+    36447    0.063    0.000    0.324    0.000 core.py:434(_check_fill_value)
+     6618    0.063    0.000    0.365    0.000 core.py:300(minimum_fill_value)
+     6618    0.056    0.000    0.521    0.000 core.py:3068(__array_wrap__)
+    36447    0.053    0.000    1.036    0.000 <__array_function__ internals>:2(copyto)
+    19854    0.032    0.000    1.156    0.000 core.py:1818(_check_mask_axis)
+     6618    0.031    0.000    0.271    0.000 core.py:4816(all)
+    13236    0.028    0.000    0.028    0.000 {built-in method numpy.zeros}
+     6618    0.027    0.000    0.461    0.000 core.py:1556(make_mask)
+     3324    0.027    0.000    2.934    0.001 {built-in method builtins.print}
+    13236    0.027    0.000    0.031    0.000 numerictypes.py:232(obj2sctype)
+    26472    0.027    0.000    0.263    0.000 core.py:206(_recursive_fill_value)
+    13236    0.025    0.000    0.032    0.000 core.py:276(_scalar_fill_value)
+    36447    0.023    0.000    1.038    0.000 _methods.py:53(_any)
+    19854    0.022    0.000    0.104    0.000 core.py:672(getdata)
+    13236    0.022    0.000    0.060    0.000 numerictypes.py:405(__getitem__)
+    39708    0.020    0.000    0.020    0.000 {built-in method numpy.geterrobj}
+    13236    0.020    0.000    0.078    0.000 core.py:1645(make_mask_none)
+    13236    0.020    0.000    0.068    0.000 core.py:231(default_fill_value)
+     6618    0.019    0.000    0.179    0.000 _ufunc_config.py:438(__exit__)
+     6648    0.013    0.000    0.109    0.000 iostream.py:418(_is_master_process)
+    19854    0.012    0.000    0.012    0.000 {method 'get' of 'dict' objects}
+     6618    0.012    0.000    0.012    0.000 _ufunc_config.py:429(__init__)
+     9317    0.011    0.000    0.011    0.000 {method 'acquire' of '_thread.lock' objects}
+    23211    0.011    0.000    0.963    0.000 _methods.py:56(_all)
+     6618    0.010    0.000    0.010    0.000 {built-in method _functools.reduce}
+     9317    0.009    0.000    0.020    0.000 threading.py:1017(_wait_for_tstate_lock)
+     6618    0.009    0.000    0.010    0.000 core.py:4027(_delegate_binop)
+     3357    0.009    0.000    0.028    0.000 <__array_function__ internals>:2(where)
+     3572    0.009    0.000    0.009    0.000 1281428236.py:2(<lambda>)
+     6618    0.008    0.000    0.008    0.000 core.py:659(<listcomp>)
+     6618    0.008    0.000    1.125    0.000 {method 'max' of 'numpy.ndarray' objects}
+     6618    0.007    0.000    1.069    0.000 _methods.py:41(_amin)
+    13236    0.007    0.000    0.007    0.000 {function _typedict.__getitem__ at 0x7f1abc15b940}
+     6618    0.007    0.000    0.007    0.000 _internal.py:870(__init__)
+     6618    0.007    0.000    0.181    0.000 core.py:351(maximum_fill_value)
+     6618    0.007    0.000    0.261    0.000 core.py:1546(_shrink_mask)
+     6648    0.007    0.000    0.387    0.000 iostream.py:437(_schedule_flush)
+     6618    0.006    0.000    0.013    0.000 core.py:3086(<listcomp>)
+     6618    0.005    0.000    0.008    0.000 core.py:3505(mask)
+     6618    0.005    0.000    1.117    0.000 _methods.py:37(_amax)
+    19854    0.004    0.000    0.004    0.000 {built-in method builtins.issubclass}
+     9317    0.003    0.000    0.003    0.000 threading.py:513(is_set)
+     9317    0.003    0.000    0.003    0.000 {method 'append' of 'collections.deque' objects}
+     3357    0.001    0.000    0.001    0.000 multiarray.py:311(where)
+     1402    0.001    0.000    0.002    0.000 1852941637.py:24(<listcomp>)
+       26    0.001    0.000    0.001    0.000 {method 'remove' of 'list' objects}
+     1402    0.001    0.000    0.002    0.000 1852941637.py:23(values)
+        1    0.000    0.000    0.000    0.000 {method 'disable' of '_lsprof.Profiler' objects}
+        1    0.000    0.000  976.042  976.042 {built-in method builtins.exec}
+        1    0.000    0.000  976.042  976.042 <string>:1(<module>)
