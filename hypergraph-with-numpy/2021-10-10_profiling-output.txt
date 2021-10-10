@@ -1,4 +1,5 @@
 2021-10-10 rhd/djb profiling Alignment hypergraph to variant graph with networkx and masked arrays
+3 paragraphs, 6 witnesses
 
 
          666764493 function calls (666751257 primitive calls) in 976.042 seconds
